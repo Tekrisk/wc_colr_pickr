@@ -1,11 +1,9 @@
 ---
-
 name: Optimization request
 about: Suggest an idea for this project
-title: ''	
-labels: ''	
+title: ''
+labels: ''
 assignees: ''
-
 ---
 
 **How the process currently work.**

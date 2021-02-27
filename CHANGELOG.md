@@ -4,41 +4,41 @@
 
 ### 2.0.0
 
--   Made the Colr Pickr a popup (meaning it will appear next to the button that launched it)
+- Made the Colr Pickr a popup (meaning it will appear next to the button that launched it)
 
--   Remove the color preview, replaced by the button changing color (also, the color box dragger can be used to see the color)
+- Remove the color preview, replaced by the button changing color (also, the color box dragger can be used to see the color)
 
--   Significantly reduced the size of the color picker
+- Significantly reduced the size of the color picker
 
--   Color change events are now triggered while changing the color, instead of when the picker is closed
+- Color change events are now triggered while changing the color, instead of when the picker is closed
 
--   Improved accessibility (specifically, tabbing through the picker)
+- Improved accessibility (specifically, tabbing through the picker)
 
--   Added keyboard shortcuts to make using the keyboard more usable
+- Added keyboard shortcuts to make using the keyboard more usable
 
--   Many style changes
+- Many style changes
 
 ### 1.2.1
 
--   Fix issue with not handling users manually changing colors for instances using the colorChange() function
+- Fix issue with not handling users manually changing colors for instances using the colorChange() function
 
 ### 1.2.0
 
--   Add function to get an array of saved colors
+- Add function to get an array of saved colors
 
--   Made functions belong to an object instead of them being global
+- Made functions belong to an object instead of them being global
 
--   Added animation when opening the color picker
+- Added animation when opening the color picker
 
--   Fixed issues that arise when color is not set when the color picker instance is initiated
+- Fixed issues that arise when color is not set when the color picker instance is initiated
 
 ### 1.1.0
 
--   Added multiple output formats to select from when you reference the event info, inside the listener for the color picker.
+- Added multiple output formats to select from when you reference the event info, inside the listener for the color picker.
 
 ### 1.0.1
 
--   Put a light grey border around custom color previews so that lighter colors, like white, can be seen
+- Put a light grey border around custom color previews so that lighter colors, like white, can be seen
 
 ---
 
