@@ -35,63 +35,56 @@
 
 ### Features:
 
--   Drag interactive color picker allowing for easy use of finding colors, including a Saturation and Lightness box, Hue slider and Opacity slider
--   Reads and outputs HEX, RGB, HSL, HEXA, RGBA and HSLA color values
--   Save custom colors to re-use on return to the color picker
--   Full Touch Support
--   ~5kb file size, meaning a super fast component of your application
--   Works on all major browsers
--   Flat and modern design interface, inspired by google chrome dev-tools color picker
+- Drag interactive color picker allowing for easy use of finding colors, including a Saturation and Lightness box, Hue slider and Opacity slider
+- Reads and outputs HEX, RGB, HSL, HEXA, RGBA and HSLA color values
+- Save custom colors to re-use on return to the color picker
+- Full Touch Support
+- ~5kb file size, meaning a super fast component of your application
+- Works on all major browsers
+- Flat and modern design interface, inspired by google chrome dev-tools color picker
 
 ### Examples:
 
--   https://r-tek.github.io/colr_pickr/get-started.html
--   https://codepen.io/TEK-Projects/pen/NWRRgRv
+- https://r-tek.github.io/colr_pickr/get-started.html
+- https://codepen.io/TEK-Projects/pen/NWRRgRv
 
 ### Getting Started:
 
 ###### Installation
 
--   Install with NPM:
+- Install with NPM:
 
-    ```shell
-    $ npm i @r-tek/colr_pickr
-    ```
+  ```shell
+  $ npm i @r-tek/colr_pickr
+  ```
 
-    If you are using a bundler like Webpack, you can import the module:
+  If you are using a bundler like Webpack, you can import the module:
 
-    ```javascript
-    // ES6
-    import pickr from '@r-tek/colr_pickr';
+  ```javascript
+  // ES6
+  import pickr from '@r-tek/colr_pickr';
 
-    // OR
+  // OR
 
-    // CommonJs
-    const pickr = require('@r-tek/colr_pickr');
-    ```
+  // CommonJs
+  const pickr = require('@r-tek/colr_pickr');
+  ```
 
-    For now, you'll need to bring in the CSS file through one of the methods below.
-
-<br />
-
--   Using the CDN via jsDelivr:
-    ```html
-    <script
-    	type="text/javascript"
-    	src="https://cdn.jsdelivr.net/npm/@r-tek/colr_pickr@2.0.0/build/colr_pickr.min.js"
-    ></script>
-    ```
-    ```html
-    <link
-    	rel="stylesheet"
-    	type="text/css"
-    	href="https://cdn.jsdelivr.net/npm/@r-tek/colr_pickr@2.0.0/build/colr_pickr.min.css"
-    />
-    ```
+  For now, you'll need to bring in the CSS file through one of the methods below.
 
 <br />
 
--   Alternatively, you could clone/download the repository. Under the /build directory, include the `colr_pickr_min.js` and the `colr_pickr_min.css` in your project.
+- Using the CDN via jsDelivr:
+  ```html
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@r-tek/colr_pickr@2.0.0/build/colr_pickr.min.js"></script>
+  ```
+  ```html
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@r-tek/colr_pickr@2.0.0/build/colr_pickr.min.css" />
+  ```
+
+<br />
+
+- Alternatively, you could clone/download the repository. Under the /build directory, include the `colr_pickr_min.js` and the `colr_pickr_min.css` in your project.
 
 ###### Usage
 
@@ -103,40 +96,40 @@
 <!-- The rest is in your JavaScript file, or in this case a script tag -->
 
 <script type="text/javascript">
-	/**
-	 * Create a new ColorPicker instance, which takes 2 parameters
-	 *
-	 * Parameter 1 [HTMLElement]: the button you want to launch the editor
-	 * Parameter 2 [String] (Optional): A color
-	 */
+  /**
+   * Create a new ColorPicker instance, which takes 2 parameters
+   *
+   * Parameter 1 [HTMLElement]: the button you want to launch the editor
+   * Parameter 2 [String] (Optional): A color
+   */
 
-	const button = document.getElementById('my_picker');
-	let picker = new ColorPicker(button, '#ff0000');
+  const button = document.getElementById('my_picker');
+  let picker = new ColorPicker(button, '#ff0000');
 
-	/**
-	 * What do you want to do after you have chosen the color?
-	 *
-	 * You can specify this in an EventListener, assigned to your button
-	 */
+  /**
+   * What do you want to do after you have chosen the color?
+   *
+   * You can specify this in an EventListener, assigned to your button
+   */
 
-	button.addEventListener('colorChange', function (event) {
-		// This will give you the color you selected
-		const color = event.detail.color.hexa;
+  button.addEventListener('colorChange', function (event) {
+    // This will give you the color you selected
+    const color = event.detail.color.hexa;
 
-		// Code to do what you want with that color...
-	});
+    // Code to do what you want with that color...
+  });
 
-	/**
-	 * You can also change the color yourself via JavaScript
-	 *
-	 * If you want to change the selected color for an instance without using the picker
-	 * You can call the following function
-	 *
-	 * Parameter 1 [String]: Color
-	 * Parameter 2 [HTMLElement]: The button that holds the instance / picker launch button
-	 */
+  /**
+   * You can also change the color yourself via JavaScript
+   *
+   * If you want to change the selected color for an instance without using the picker
+   * You can call the following function
+   *
+   * Parameter 1 [String]: Color
+   * Parameter 2 [HTMLElement]: The button that holds the instance / picker launch button
+   */
 
-	colorPickerComp.colorChange('#ff00ff', button);
+  colorPickerComp.colorChange('#ff00ff', button);
 </script>
 ```
 

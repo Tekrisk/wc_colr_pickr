@@ -1,0 +1,20 @@
+<html lang="en">
+  <title>WC Colr Pickr</title>
+  <head>
+    <script type="module" src="wc-colr-pickr.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>WC Colr Pickr</h1>
+      <wc-colr-pickr></wc-colr-pickr>
+    </main>
+    <script>
+      const colrPickrElements = document.querySelectorAll('wc-colr-pickr');
+      colrPickrElements.forEach((element) =>
+        element.addEventListener('updatedColor', (event) => {
+          console.log('updatedColor', event, event.detail);
+        })
+      );
+    </script>
+  </body>
+</html>

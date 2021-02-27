@@ -1,60 +1,85 @@
 {
-	"name": "@r-tek/colr_pickr",
-	"version": "2.0.0",
-	"description": "Colr Pickr, a vanilla JavaScript color picker component built with SVGs, with features like saving colors. Similar design to the chrome-dev-tools color picker.",
-	"author": "R-TEK",
-	"homepage": "https://r-tek.github.io/colr_pickr/",
-	"main": "build/colr_pickr.min.js",
-	"module": "build/colr_pickr.min.js",
-	"unpkg": "build/colr_pickr.min.js",
-	"browser": "build/colr_pickr.min.js",
-	"license": "MIT",
-	"scripts": {
-		"build": "gulp productionBuild",
-		"doc": "jsdoc -c jsdoc.json",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/R-TEK/colr_pickr.git"
-	},
-	"bugs": {
-		"url": "https://github.com/R-TEK/colr_pickr/issues"
-	},
-	"keywords": [
-		"vanilla",
-		"vanilla-js",
-		"color picker",
-		"color-picker",
-		"colorpicker",
-		"lightweight",
-		"ux",
-		"ui",
-		"color",
-		"colour",
-		"picker",
-		"rgb",
-		"rgba",
-		"hsl",
-		"hsla",
-		"hex",
-		"alpha",
-		"save colors",
-		"custom colors"
-	],
-	"files": [
-		"build/"
-	],
-	"devDependencies": {
-		"gulp": "^4.0.2",
-		"gulp-concat": "^2.6.1",
-		"gulp-concat-css": "^3.1.0",
-		"gulp-markdown": "^5.0.1",
-		"gulp-rimraf": "^1.0.0",
-		"gulp-sass": "^4.1.0",
-		"gulp-uglify-es": "^2.0.0",
-		"gulp-uglifycss": "^1.1.0",
-		"jsdoc": "^3.6.4",
-		"node-sass": "^4.14.1"
-	}
+  "name": "@r-tek/colr_pickr",
+  "version": "2.0.0",
+  "description": "Colr Pickr, a vanilla JavaScript color picker component built with SVGs, with features like saving colors. Similar design to the chrome-dev-tools color picker.",
+  "author": "R-TEK",
+  "homepage": "https://github.com/Tekrisk/wc_colr_pickr",
+  "main": "dist/wc-colr-pickr.js",
+  "module": "dist/wc-colr-pickr.js",
+  "unpkg": "dist/wc-colr-pickr.js",
+  "browser": "dist/wc-colr-pickr.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --env production && npm run test && npm run docs",
+    "docs": "rimraf docs && wca analyze \"src/components/**/*.js\" --outDir docs",
+    "start": "webpack serve",
+    "test": "karma start",
+    "prettify": "prettier . -w"
+  },
+  "browserslist": [
+    "edge > 79",
+    "firefox > 63",
+    "chrome > 61",
+    "safari > 10.1"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tekrisk/wc_colr_pickr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Tekrisk/wc_colr_pickr/issues"
+  },
+  "keywords": [
+    "js",
+    "color picker",
+    "color-picker",
+    "colorpicker",
+    "lightweight",
+    "web component",
+    "webcomponent",
+    "ux",
+    "ui",
+    "color",
+    "colour",
+    "picker",
+    "rgb",
+    "rgba",
+    "hsl",
+    "hsla",
+    "hex",
+    "alpha",
+    "save colors",
+    "custom colors"
+  ],
+  "files": [
+    "dist/"
+  ],
+  "devDependencies": {
+    "@chiragrupani/karma-chromium-edge-launcher": "^2.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.15.0",
+    "eslint-webpack-plugin": "^2.4.1",
+    "html-loader": "^1.3.2",
+    "jasmine": "^3.6.3",
+    "karma": "^5.2.3",
+    "karma-babel-preprocessor": "^8.0.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-jasmine": "^4.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "mini-css-extract-plugin": "^1.3.3",
+    "prettier": "^2.2.1",
+    "raw-loader": "^4.0.2",
+    "replace-in-files": "^3.0.0",
+    "sass": "^1.30.0",
+    "sass-loader": "^10.1.0",
+    "style-loader": "^2.0.0",
+    "terser-webpack-plugin": "^5.0.3",
+    "to-string-loader": "^1.1.6",
+    "web-component-analyzer": "^1.1.6",
+    "webpack": "^5.11.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  }
 }

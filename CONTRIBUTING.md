@@ -38,10 +38,10 @@ $ gulp watch
 
 Make a test case for the bug or feature you are introducing into the project. To add a test case follow these steps:
 
--   Go to the google sheets page https://docs.google.com/spreadsheets/d/1CI887TolHwWMO1AjMvw_HjqIk_CLL1DHMBXizVzD8_w/edit?usp=sharing
--   Go under the section (sections highlighted in dark green) that you issue comes under
--   Insert a new row and follow the column title to create the test case (i.e. Test Case name under test case column etc)
--   Copy the drop down at the top of the page and insert it into the 'PASS/FAIL' column for the test case
+- Go to the google sheets page https://docs.google.com/spreadsheets/d/1CI887TolHwWMO1AjMvw_HjqIk_CLL1DHMBXizVzD8_w/edit?usp=sharing
+- Go under the section (sections highlighted in dark green) that you issue comes under
+- Insert a new row and follow the column title to create the test case (i.e. Test Case name under test case column etc)
+- Copy the drop down at the top of the page and insert it into the 'PASS/FAIL' column for the test case
 
 ### Open sample.html file
 
@@ -67,12 +67,12 @@ Use the test case document to test the project as a whole, follow this link to t
 
 Test under the following:
 
--   Desktop Chrome
--   Desktop Firefox
--   Desktop Edge
--   Mobile Chrome
--   Mobile Firefox
--   Mobile Edge
+- Desktop Chrome
+- Desktop Firefox
+- Desktop Edge
+- Mobile Chrome
+- Mobile Firefox
+- Mobile Edge
 
 ### Push All
 
