@@ -1,11 +1,11 @@
 const HueSlider = {
   _this: null,
 
-  connectedCallback: function() {
+  connectedCallback: function () {
     this.initHSEventListeners();
   },
 
-  initHSEventListeners: function() {    
+  initHSEventListeners: function () {
     /**
      * Mouse Events
      */
@@ -76,7 +76,7 @@ const HueSlider = {
   },
 
   // Function to handle changes to the HUE slider
-  colorSliderHandler: function(position) {
+  colorSliderHandler: function (position) {
     // Defining the slider and dragger
     const sliderContainer = this._this.shadowRoot.getElementById('color_slider');
     const sliderDragger = this._this.shadowRoot.getElementById('color_slider_dragger');
@@ -115,7 +115,7 @@ const HueSlider = {
 
     // Update
     this._this.updatePicker();
-  }
-}
+  },
+};
 
 export default HueSlider;

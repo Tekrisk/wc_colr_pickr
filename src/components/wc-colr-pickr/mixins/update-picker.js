@@ -4,7 +4,7 @@ const UpdatePicker = {
   _this: null,
 
   // Function to update color displays
-  updateColorDisplays: function(color) {
+  updateColorDisplays: function (color) {
     let uColor = color;
 
     // Checking if color picker has not been set
@@ -106,7 +106,7 @@ const UpdatePicker = {
   },
 
   // Update the color value inputs
-  updateColorValueInput: function() {
+  updateColorValueInput: function () {
     // Checking the value color type the user has selected
     if (this._this.colorTypeStatus === 'HEXA') {
       // Converting the value
@@ -130,7 +130,7 @@ const UpdatePicker = {
       this._this.shadowRoot.querySelectorAll('.hsla_input')[2].value = this._this.lightness;
       this._this.shadowRoot.querySelectorAll('.hsla_input')[3].value = this._this.alpha;
     }
-  }
-}
+  },
+};
 
 export default UpdatePicker;

@@ -1,11 +1,11 @@
 const OpacitySlider = {
   _this: null,
 
-  connectedCallback: function() {
+  connectedCallback: function () {
     this.initOSEventListeners();
   },
 
-  initOSEventListeners: function() {
+  initOSEventListeners: function () {
     /**
      * Mouse Events
      */
@@ -81,7 +81,7 @@ const OpacitySlider = {
    */
 
   // Function to handle changes to the opacity slider
-  opacitySliderHandler: function(position) {
+  opacitySliderHandler: function (position) {
     // Defining the slider and dragger
     const sliderContainer = this._this.shadowRoot.getElementById('opacity_slider');
     const sliderDragger = this._this.shadowRoot.getElementById('opacity_slider_dragger');
@@ -117,7 +117,7 @@ const OpacitySlider = {
 
     // Update
     this._this.updatePicker();
-  }
-}
+  },
+};
 
 export default OpacitySlider;

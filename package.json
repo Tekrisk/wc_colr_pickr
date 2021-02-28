@@ -1,8 +1,8 @@
 {
-  "name": "@r-tek/colr_pickr",
-  "version": "2.0.0",
-  "description": "Colr Pickr, a vanilla JavaScript color picker component built with SVGs, with features like saving colors. Similar design to the chrome-dev-tools color picker.",
-  "author": "R-TEK",
+  "name": "@tekrisk/wc_colr_pickr",
+  "version": "0.1.0",
+  "description": "WC Colr Pickr, a color picker web component based on @r-tek/colr_pickr project. Built with SVGs, with features like saving colors.",
+  "author": "Tekrisk",
   "homepage": "https://github.com/Tekrisk/wc_colr_pickr",
   "main": "dist/wc-colr-pickr.js",
   "module": "dist/wc-colr-pickr.js",
@@ -68,6 +68,7 @@
     "karma-firefox-launcher": "^2.1.0",
     "karma-jasmine": "^4.0.1",
     "karma-spec-reporter": "0.0.32",
+    "lit-element": "^2.4.0",
     "mini-css-extract-plugin": "^1.3.3",
     "prettier": "^2.2.1",
     "raw-loader": "^4.0.2",
@@ -78,8 +79,9 @@
     "terser-webpack-plugin": "^5.0.3",
     "to-string-loader": "^1.1.6",
     "web-component-analyzer": "^1.1.6",
-    "webpack": "^5.11.0",
+    "webpack": "^5.24.2",
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.2"
-  }
+  },
+  "dependencies": {}
 }

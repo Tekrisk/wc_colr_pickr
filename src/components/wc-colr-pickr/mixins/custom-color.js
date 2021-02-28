@@ -2,7 +2,7 @@ const CustomColor = {
   _this: null,
 
   // Function to add a new custom color
-  addCustomColor: function() {
+  addCustomColor: function () {
     // Getting the color
     const color = `hsla(${this._this.hue}, ${this._this.saturation}%, ${this._this.lightness}%, ${this._this.alpha})`;
 
@@ -15,14 +15,14 @@ const CustomColor = {
     this._this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
 
     // Pushing the color to the top of the array
-    this._this.LSCustomColors[0].unshift({value: color});
+    this._this.LSCustomColors[0].unshift({ value: color });
 
     // Updating the local storage with the new custom color
     localStorage.setItem('custom_colors', JSON.stringify(this._this.LSCustomColors));
   },
 
   // Clears a selected custom color
-  clearSingleCustomColor: function(element) {
+  clearSingleCustomColor: function (element) {
     const elemToRemove = element === undefined ? this._this.contextMenuElem : element;
 
     // Removing the element
@@ -42,7 +42,7 @@ const CustomColor = {
       let element = this._this.shadowRoot.querySelectorAll('.custom_colors_preview')[x];
       this._this.LSCustomColors[0].push({
         value: element.getAttribute('data-custom-color'),
-        title: element.getAttribute('title')
+        title: element.getAttribute('title'),
       });
     }
 
@@ -54,7 +54,7 @@ const CustomColor = {
   },
 
   // Clears all custom colors
-  clearAllCustomColors: function() {
+  clearAllCustomColors: function () {
     // Clearing variable
     this._this.LSCustomColors = { 0: [] };
 
@@ -70,7 +70,7 @@ const CustomColor = {
     this._this.shadowRoot.getElementById('custom_colors_add').style.display = 'inline-block';
   },
 
-  connectedCallback: function() {
+  connectedCallback: function () {
     // Click on color listener to update the picker
     this._this.shadowRoot.getElementById('custom_colors_box').addEventListener('click', (event) => {
       // Making sure the users has selected a color preview
@@ -117,7 +117,7 @@ const CustomColor = {
     this._this.shadowRoot.getElementById('color_clear_all').addEventListener('mousedown', () => {
       this.clearAllCustomColors();
     });
-  }
-}
+  },
+};
 
 export default CustomColor;

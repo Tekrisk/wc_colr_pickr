@@ -14,7 +14,7 @@ const ColorChangeEvent = {
    * const button = document.getElementById('my_button');
    * this._this.colorChange('#ff0000', button);
    */
-  colorChange: function(color) {
+  colorChange: function (color) {
     let _color = color;
 
     // If the user send a string manually...
@@ -60,6 +60,6 @@ const ColorChangeEvent = {
     // Dispatching the event for the active object
     this._this.shadowRoot.dispatchEvent(event);
   },
-}
+};
 
 export default ColorChangeEvent;

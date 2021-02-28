@@ -1,4 +1,4 @@
-import html from './wc-colr-pickr.html';
+import { LitElement, html, css } from 'lit-element';
 import scss from './wc-colr-pickr.scss';
 import ColorChangeEvent from './mixins/color-change-event';
 import ColorTextValues from './mixins/color-text-values';
@@ -15,8 +15,6 @@ import UpdatePicker from './mixins/update-picker';
 const Static = {
   elementInstance: 0,
   component: 'wc-colr-pickr',
-  htmlText: html,
-  cssText: `<style>${scss}</style>`,
   debug: !production,
 };
 Object.seal(Static);
@@ -26,7 +24,19 @@ Object.seal(Static);
  *
  * @element wc-colr-pickr
  */
-export class WCColrPickr extends HTMLElement {
+export class WCColrPickr extends LitElement {
+  // This decorator creates a property accessor that triggers rendering and
+  // an observed attribute.
+  static get properties() {
+    return {
+      selectedColor: { type: String },
+    };
+  }
+
+  static get styles() {
+    return css(scss);
+  }
+
   /**
    * Creates an instance of WCColrPickr.
    * @memberof WCColrPickr
@@ -34,9 +44,8 @@ export class WCColrPickr extends HTMLElement {
   constructor() {
     super();
     Static.elementInstance++;
-    this.attachShadow({ mode: 'open' });
-    this.listeners = [];
 
+    this.selectedColor = '#ff0000';
     this.pickerOpen = false;
     this.instance = null;
     this.boxStatus = false;
@@ -52,23 +61,31 @@ export class WCColrPickr extends HTMLElement {
     this.alpha = 1;
     this.contextMenuElem = null;
     this.doubleTapTime = 0;
-    this.LSCustomColors = { 0: [
-      {
-        'value': 'red',
-      }, {
-        'value': 'blue',
-      }, {
-        'value': 'green',
-      }, {
-        'value': 'yellow',
-      }, {
-        'value': 'purple',
-      }, {
-        'value': 'orange',
-      }, {
-        'value': 'lime',
-      }
-    ] };
+    this.LSCustomColors = {
+      0: [
+        {
+          value: 'red',
+        },
+        {
+          value: 'blue',
+        },
+        {
+          value: 'green',
+        },
+        {
+          value: 'yellow',
+        },
+        {
+          value: 'purple',
+        },
+        {
+          value: 'orange',
+        },
+        {
+          value: 'lime',
+        },
+      ],
+    };
     UpdatePicker._this = this;
     SaturationLightnessBox._this = this;
     OpacitySlider._this = this;
@@ -76,6 +93,12 @@ export class WCColrPickr extends HTMLElement {
     CustomColor._this = this;
     ColorTextValues._this = this;
     HueSlider._this = this;
+    this._togglePicker = this._togglePicker.bind(this);
+  }
+
+  // Render element DOM by returning a `lit-html` template.
+  render() {
+    return this._getTemplate();
   }
 
   updateColorDisplays(color) {
@@ -91,16 +114,12 @@ export class WCColrPickr extends HTMLElement {
    * @memberof WCColrPickr
    */
   connectedCallback() {
-    // add css and html to the shadowRoot
-    this.shadowRoot.innerHTML = Static.cssText + Static.htmlText;
-
+    super.connectedCallback();
     // init properties by attributes or set default
     if (Static.debug) {
       console.debug(`${Static.component}.connectedCallback, initialized properties:`);
     }
 
-    // add eventlisteners from attributes
-    this.addEventListenersFromAttributes();
     this.initPickR();
     ColorTextValues.connectedCallback();
     CustomColor.connectedCallback();
@@ -114,10 +133,10 @@ export class WCColrPickr extends HTMLElement {
    * @memberof WCColrPickr
    */
   disconnectedCallback() {
+    super.disconnectedCallback();
     if (Static.debug) {
       console.debug(`${Static.component}.disconnectCallback`);
     }
-    this.listeners.forEach((listener) => listener.element.removeEventListener(listener.event, listener.function));
   }
 
   /**
@@ -125,66 +144,10 @@ export class WCColrPickr extends HTMLElement {
    * @memberof WCColrPickr
    */
   adoptedCallback() {
+    super.adoptedCallback();
     if (Static.debug) {
       console.debug(`${Static.component}.adoptedCallback`, this);
     }
-  }
-
-  /**
-   * Invoked each time one of the custom element's attributes is added, removed, or changed.
-   * Which attributes to notice change for is specified in a static get observedAttributes method
-   * @param {String} attrName
-   * @param {String} oldValue
-   * @param {String} newValue
-   * @memberof WCColrPickr
-   */
-  attributeChangedCallback(attrName, oldValue, newValue) {
-    if (oldValue !== newValue && this[attrName]) {
-      this[attrName] = newValue;
-    }
-  }
-
-  /**
-   * Specifies which attributes are observed (attributeChangedCallback will only invoked for the specified attributes).
-   * @readonly
-   * @static
-   * @type {[String]}
-   * @memberof WCColrPickr
-   */
-  static get observedAttributes() {
-    return [];
-  }
-
-  /**
-   * Adds any event listeners defined with the data-action attribute defined on elements inside your template.
-   * Example: <div data-action="click:handleClick"> will listen for the click event with this.handleClick as target.
-   * @memberof WCColrPickr
-   */
-  addEventListenersFromAttributes() {
-    Array.from(this.shadowRoot.querySelectorAll('[data-action]')).forEach((element) => {
-      const actions = element.getAttribute('data-action').split(' ');
-
-      actions.forEach((action) => {
-        try {
-          let targetEvent = action.split(':')[0];
-          let targetFunc = action.split(':')[1];
-
-          if (this[targetFunc]) {
-            element.addEventListener(targetEvent, this[targetFunc]);
-            // add to listeners for removal on disconnect
-            this.listeners.push({
-              element: element,
-              function: this[targetFunc],
-              event: targetEvent,
-            });
-          } else {
-            console.error(`${Static.component}.addEventListenersFromAttributes: target function ${targetFunc} is undefined!`);
-          }
-        } catch (error) {
-          console.error(`{Static.component}.addEventListenersFromAttributes failed for element: `, element, action);
-        }
-      });
-    });
   }
 
   initPickR() {
@@ -196,80 +159,8 @@ export class WCColrPickr extends HTMLElement {
       // If it has then I define the LSCustomColors with the value for this
       this.LSCustomColors = JSON.parse(localStorage.getItem('custom_colors'));
     }
-     
-    // Looping through the data to update the DOM with the custom colors
-    for (let x = this.LSCustomColors[0].length - 1; x >= 0; x--) {
-      // Creating the element
-      let customColorElem = document.createElement('BUTTON');
-      customColorElem.className = 'custom_colors_preview';
-      customColorElem.style.background = this.LSCustomColors[0][x].value;
-      customColorElem.setAttribute('data-custom-color', this.LSCustomColors[0][x].value);
-      customColorElem.setAttribute(
-        'title', 
-        this.LSCustomColors[0][x].label ?
-        this.LSCustomColors[0][x].value : 
-        this.LSCustomColors[0][x].value
-      );
 
-      // Placing the element in the DOM
-      this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
-    }
-
-    // Adding the object to the elements object
-    this.colorPickerObj = this;
     this.button = this.shadowRoot.getElementById('toggle_pickr');
-
-    // Setting color value as a data attribute and changing elements color if color param is given
-    this.button.setAttribute('data-color', '#ff0000');
-    this.button.style.background = '#ff0000';
-
-    // Click listener to have the button open the color picker interface
-    this.button.addEventListener('click', () => {
-      // Update state
-      this.pickerOpen = true;
-
-      // Define picker
-      const picker = this.shadowRoot.getElementById('color_picker');
-
-      // Displaying the color picker
-      picker.style.display = 'grid';
-
-      // Find position of button
-      let top = this.button.getBoundingClientRect().top;
-      let left = this.button.getBoundingClientRect().left;
-
-      // If the picker will go off bottom of screen...
-      if (top + picker.offsetHeight > window.innerHeight) {
-        // Place it above the button
-        top = top - picker.offsetHeight - 2;
-      }
-      // If the picker will go off top of screen...
-      else {
-        // Place it beneath the button
-        top = top + this.button.offsetHeight + 2;
-      }
-
-      // If the picker will go off the right of screen...
-      if (left + picker.offsetWidth > window.innerWidth - 20) {
-        // Calculate the difference
-        let difference = left + picker.offsetWidth - window.innerWidth;
-
-        // Move the picker back by the difference
-        left = left - difference - 20;
-      }
-
-      // Applying the position
-      picker.style.top = top + 'px';
-      picker.style.left = left + 'px';
-
-      // Updating the color picker
-      this.updateColorDisplays(this.button.getAttribute('data-color'));
-
-      // Focus on a picker item
-      this.shadowRoot.getElementById('color_text_values').focus();
-
-      picker.addEventListener('keydown', this.keyShortcuts.bind(this));
-    });
 
     // Remove outline from tabbing
     this.shadowRoot.querySelector('.wc-colr-pickr').addEventListener('mousedown', () => {
@@ -375,6 +266,207 @@ export class WCColrPickr extends HTMLElement {
       l: this.lightness,
       a: this.alpha,
     });
+  }
+
+  _togglePicker() {
+    // Update state
+    this.pickerOpen = true;
+
+    // Define picker
+    const picker = this.shadowRoot.getElementById('color_picker');
+
+    // Displaying the color picker
+    picker.style.display = 'grid';
+
+    // Find position of button
+    let top = this.button.getBoundingClientRect().top;
+    let left = this.button.getBoundingClientRect().left;
+
+    // If the picker will go off bottom of screen...
+    if (top + picker.offsetHeight > window.innerHeight) {
+      // Place it above the button
+      top = top - picker.offsetHeight - 2;
+    }
+    // If the picker will go off top of screen...
+    else {
+      // Place it beneath the button
+      top = top + this.button.offsetHeight + 2;
+    }
+
+    // If the picker will go off the right of screen...
+    if (left + picker.offsetWidth > window.innerWidth - 20) {
+      // Calculate the difference
+      let difference = left + picker.offsetWidth - window.innerWidth;
+
+      // Move the picker back by the difference
+      left = left - difference - 20;
+    }
+
+    // Applying the position
+    picker.style.top = top + 'px';
+    picker.style.left = left + 'px';
+
+    // Updating the color picker
+    this.updateColorDisplays(this.button.getAttribute('data-color'));
+
+    // Focus on a picker item
+    this.shadowRoot.getElementById('color_text_values').focus();
+
+    picker.addEventListener('keydown', this.keyShortcuts.bind(this));
+  }
+
+  _getTemplate() {
+    return html`
+      <div class="wc-colr-pickr">
+        <!-- Add a button to your HTML document and give it any ID -->
+        <button data-color="${this.selectedColor}" style="background-color: ${this.selectedColor}" @click="${this._togglePicker}"></button>
+        <aside id="color_picker" class="picker-container">
+          <div class="picker-main">
+            <svg id="color_box" width="263" height="130">
+              <defs>
+                <linearGradient id="saturation" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#fff"></stop>
+                  <stop offset="100%" stop-color="hsl(0,100%,50%)"></stop>
+                </linearGradient>
+                <linearGradient id="brightness" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(0,0,0,0)"></stop>
+                  <stop offset="100%" stop-color="#000"></stop>
+                </linearGradient>
+                <pattern id="pattern_config" width="100%" height="100%">
+                  <rect x="0" y="0" width="100%" height="100%" fill="url(#saturation)"></rect>
+                  }
+                  <rect x="0" y="0" width="100%" height="100%" fill="url(#brightness)"></rect>
+                </pattern>
+              </defs>
+              <rect rx="5" ry="5" x="1" y="1" width="263" height="130" stroke="#fff" stroke-width="2" fill="url(#pattern_config)"></rect>
+              <svg id="box_dragger" x="336" y="14" style="overflow: visible">
+                <circle r="9" fill="none" stroke="#000" stroke-width="2"></circle>
+                <circle r="7" fill="none" stroke="#fff" stroke-width="2"></circle>
+              </svg>
+            </svg>
+            <div id="sliders">
+              <svg id="color_slider" width="263" height="20">
+                <defs>
+                  <linearGradient id="hue" x1="100%" y1="0%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#f00"></stop>
+                    <stop offset="16.666%" stop-color="#ff0"></stop>
+                    <stop offset="33.333%" stop-color="#0f0"></stop>
+                    <stop offset="50%" stop-color="#0ff"></stop>
+                    <stop offset="66.666%" stop-color="#00f"></stop>
+                    <stop offset="83.333%" stop-color="#f0f"></stop>
+                    <stop offset="100%" stop-color="#f00"></stop>
+                  </linearGradient>
+                </defs>
+                <rect rx="5" ry="5" x="1" y="1" width="263" height="20" stroke="#fff" stroke-width="2" fill="url(#hue)"></rect>
+                <svg id="color_slider_dragger" x="277" y="11" style="overflow: visible">
+                  <circle r="7" fill="none" stroke="#000" stroke-width="2"></circle>
+                  <circle r="5" fill="none" stroke="#fff" stroke-width="2"></circle>
+                </svg>
+              </svg>
+              <svg id="opacity_slider" width="263" height="20">
+                <defs>
+                  <linearGradient id="opacity" x1="100%" y1="0%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="#000"></stop>
+                    <stop offset="100%" stop-color="#fff"></stop>
+                  </linearGradient>
+                </defs>
+                <rect rx="5" ry="5" x="1" y="6" width="263" height="10" stroke="#fff" stroke-width="2" fill="url(#opacity)"></rect>
+                <svg id="opacity_slider_dragger" x="277" y="11" style="overflow: visible">
+                  <circle r="7" fill="none" stroke="#000" stroke-width="2"></circle>
+                  <circle r="5" fill="none" stroke="#fff" stroke-width="2"></circle>
+                </svg>
+              </svg>
+            </div>
+            <div id="color_text_values" tabindex="0">
+              <div id="hexa">
+                <input id="hex_input" name="hex_input" type="text" maxlength="9" spellcheck="false" />
+                <br />
+                <label for="hex_input" class="label_text">HEX</label>
+              </div>
+              <div id="rgba" style="display: none">
+                <div class="rgba_divider">
+                  <input class="rgba_input" name="r" type="number" min="0" max="255" />
+                  <br />
+                  <label for="r" class="label_text">R</label>
+                </div>
+                <div class="rgba_divider">
+                  <input class="rgba_input" name="g" type="number" min="0" max="255" />
+                  <br />
+                  <label for="g" class="label_text">G</label>
+                </div>
+                <div class="rgba_divider">
+                  <input class="rgba_input" name="b" type="number" min="0" max="255" />
+                  <br />
+                  <label for="b" class="label_text">B</label>
+                </div>
+                <div class="rgba_divider">
+                  <input class="rgba_input" name="a" type="number" step="0.1" min="0" max="1" />
+                  <br />
+                  <label for="a" class="label_text">A</label>
+                </div>
+              </div>
+              <div id="hsla" style="display: none">
+                <div class="hsla_divider">
+                  <input class="hsla_input" name="h" type="number" min="0" max="359" />
+                  <br />
+                  <label for="h" class="label_text">H</label>
+                </div>
+                <div class="hsla_divider">
+                  <input class="hsla_input" name="s" type="number" min="0" max="100" />
+                  <br />
+                  <label for="s" class="label_text">S%</label>
+                </div>
+                <div class="hsla_divider">
+                  <input class="hsla_input" name="l" type="number" min="0" max="100" />
+                  <br />
+                  <label for="l" class="label_text">L%</label>
+                </div>
+                <div class="rgba_divider">
+                  <input class="hsla_input" name="a" type="number" step="0.1" min="0" max="1" />
+                  <br />
+                  <label for="a" class="label_text">A</label>
+                </div>
+              </div>
+              <button id="switch_color_type" class="remove_outline" name="switch-color-type">
+                <svg viewBox="0 -2 24 24" width="20" height="20">
+                  <path fill="#555" d="M6 11v-4l-6 5 6 5v-4h12v4l6-5-6-5v4z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div id="custom_colors" class="picker-custom-colors">
+            <div id="custom_colors_header">
+              <svg id="custom_colors_pallet_icon" viewBox="0 0 24 24" width="15" height="18">
+                <path
+                  fill="#555"
+                  d="M4 21.832c4.587.38 2.944-4.493 7.188-4.538l1.838 1.534c.458 5.538-6.315 6.773-9.026 3.004zm14.065-7.115c1.427-2.239 5.847-9.749 5.847-9.749.352-.623-.43-1.273-.976-.813 0 0-6.572 5.714-8.511 7.525-1.532 1.432-1.539 2.086-2.035 4.447l1.68 1.4c2.227-.915 2.868-1.039 3.995-2.81zm-11.999 3.876c.666-1.134 1.748-2.977 4.447-3.262.434-2.087.607-3.3 2.547-5.112 1.373-1.282 4.938-4.409 7.021-6.229-1-2.208-4.141-4.023-8.178-3.99-6.624.055-11.956 5.465-11.903 12.092.023 2.911 1.081 5.571 2.82 7.635 1.618.429 2.376.348 3.246-1.134zm6.952-15.835c1.102-.006 2.005.881 2.016 1.983.004 1.103-.882 2.009-1.986 2.016-1.105.009-2.008-.88-2.014-1.984-.013-1.106.876-2.006 1.984-2.015zm-5.997 2.001c1.102-.01 2.008.877 2.012 1.983.012 1.106-.88 2.005-1.98 2.016-1.106.007-2.009-.881-2.016-1.988-.009-1.103.877-2.004 1.984-2.011zm-2.003 5.998c1.106-.007 2.01.882 2.016 1.985.01 1.104-.88 2.008-1.986 2.015-1.105.008-2.005-.88-2.011-1.985-.011-1.105.879-2.004 1.981-2.015zm10.031 8.532c.021 2.239-.882 3.718-1.682 4.587l-.046.044c5.255-.591 9.062-4.304 6.266-7.889-1.373 2.047-2.534 2.442-4.538 3.258z"
+                />
+              </svg>
+              <button id="custom_colors_add" class="remove_outline" name="add-a-custom-color">
+                <svg viewBox="0 -2 24 24" width="14" height="16">
+                  <path fill="#555" d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
+                </svg>
+              </button>
+            </div>
+            <div id="custom_colors_box">
+              ${this.LSCustomColors[0].map(
+                (color) =>
+                  html`<button
+                    class="custom_colors_preview"
+                    style="background-color: ${color.value};"
+                    data-custom-color="${color.value}"
+                    title="${color.label ? color.label + ' (' + color.value + ')' : color.value}"
+                  ></button>`
+              )}
+            </div>
+          </div>
+          <div id="color_context_menu" class="color_ctx_menu">
+            <button id="color_clear_single" class="color_ctx_menu" name="remove-single-color">Remove</button>
+            <button id="color_clear_all" class="color_ctx_menu" name="remove-all-colors">Remove All</button>
+          </div>
+        </aside>
+      </div>
+    `;
   }
 }
 window.customElements.define('wc-colr-pickr', WCColrPickr);

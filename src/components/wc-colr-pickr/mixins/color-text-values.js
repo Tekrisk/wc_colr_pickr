@@ -4,7 +4,7 @@ const ColorTextValues = {
   _this: null,
 
   // Function to switch the color type inputs
-  switchColorType: function() {
+  switchColorType: function () {
     // Checking the current selected input color type
     if (this._this.colorTypeStatus === 'HEXA') {
       // Updating the data object
@@ -51,7 +51,7 @@ const ColorTextValues = {
     }
   },
 
-  connectedCallback: function() {
+  connectedCallback: function () {
     this._this.shadowRoot.getElementById('switch_color_type').addEventListener('click', () => {
       this.switchColorType();
     });
@@ -112,7 +112,7 @@ const ColorTextValues = {
         this._this.updatePicker();
       });
     });
-  }
-}
+  },
+};
 
 export default ColorTextValues;

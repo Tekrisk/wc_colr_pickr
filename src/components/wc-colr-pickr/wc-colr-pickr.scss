@@ -28,9 +28,9 @@
     grid-template-rows: min-content min-content min-content;
     gap: 0px 0px;
     grid-template-areas:
-      "picker-main picker-custom-colors . ."
-      ". . . ."
-      ". . . .";
+      'picker-main picker-custom-colors . .'
+      '. . . .'
+      '. . . .';
     background-color: #fff;
     padding: 5px;
     height: 245px;
@@ -45,9 +45,9 @@
     grid-template-rows: min-content min-content min-content;
     gap: 0px 0px;
     grid-template-areas:
-      "."
-      "."
-      ".";
+      '.'
+      '.'
+      '.';
     grid-area: picker-main;
   }
 
@@ -56,8 +56,7 @@
     grid-template-columns: 100%;
     grid-template-rows: min-content;
     gap: 0px 0px;
-    grid-template-areas:
-      ".";
+    grid-template-areas: '.';
     grid-area: picker-custom-colors;
   }
 

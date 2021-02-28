@@ -5,7 +5,7 @@ WCColrPickr web component.
 ## Properties
 
 | Property             | Type      | Default  |
-|----------------------|-----------|----------|
+| -------------------- | --------- | -------- |
 | `LSCustomColors`     | `object`  | {"0":[]} |
 | `alpha`              | `number`  | 1        |
 | `boxStatus`          | `boolean` | false    |
@@ -26,13 +26,13 @@ WCColrPickr web component.
 
 ## Methods
 
-| Method                            | Type                 | Description                                      |
-|-----------------------------------|----------------------|--------------------------------------------------|
+| Method                            | Type                 | Description                                                                                                                                                                                                                    |
+| --------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `addEventListenersFromAttributes` | `(): void`           | Adds any event listeners defined with the data-action attribute defined on elements inside your template.<br />Example: <div data-action="click:handleClick"> will listen for the click event with this.handleClick as target. |
-| `adoptedCallback`                 | `(): void`           | Invoked when the custom element is moved to a new document |
-| `closePicker`                     | `(): void`           |                                                  |
-| `initPickR`                       | `(): void`           |                                                  |
-| `keyShortcuts`                    | `(event: any): void` |                                                  |
-| `updateColorDisplays`             | `(color: any): void` |                                                  |
-| `updateColorValueInput`           | `(): void`           |                                                  |
-| `updatePicker`                    | `(): void`           |                                                  |
+| `adoptedCallback`                 | `(): void`           | Invoked when the custom element is moved to a new document                                                                                                                                                                     |
+| `closePicker`                     | `(): void`           |                                                                                                                                                                                                                                |
+| `initPickR`                       | `(): void`           |                                                                                                                                                                                                                                |
+| `keyShortcuts`                    | `(event: any): void` |                                                                                                                                                                                                                                |
+| `updateColorDisplays`             | `(color: any): void` |                                                                                                                                                                                                                                |
+| `updateColorValueInput`           | `(): void`           |                                                                                                                                                                                                                                |
+| `updatePicker`                    | `(): void`           |                                                                                                                                                                                                                                |

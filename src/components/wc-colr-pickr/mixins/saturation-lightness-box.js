@@ -1,11 +1,11 @@
 const SaturationLightnessBox = {
   _this: null,
 
-  connectedCallback: function() {
+  connectedCallback: function () {
     this.initSLBEventListeners();
   },
 
-  initSLBEventListeners: function() {
+  initSLBEventListeners: function () {
     /**
      * Mouse Events
      */
@@ -80,17 +80,14 @@ const SaturationLightnessBox = {
    * Saturation and Lightness Box
    */
   // Function to handle changes to the saturation and lightness box
-  colorBoxHandler: function(positionX, positionY, touch) {
+  colorBoxHandler: function (positionX, positionY, touch) {
     // Defining the box and dragger
     const boxContainer = this._this.shadowRoot.getElementById('color_box');
     const boxDragger = this._this.shadowRoot.getElementById('box_dragger');
 
     // Defining X and Y position, Y differently works with scroll so I make conditions for that
     let eventX = positionX - boxContainer.getBoundingClientRect().left;
-    let eventY =
-      touch === true
-        ? positionY - boxContainer.getBoundingClientRect().top
-        : positionY - boxContainer.getBoundingClientRect().top - window.scrollY;
+    let eventY = touch === true ? positionY - boxContainer.getBoundingClientRect().top : positionY - boxContainer.getBoundingClientRect().top - window.scrollY;
 
     // Making conditions so that the user don't drag outside the box
     if (eventX < 14) eventX = 14;
@@ -131,7 +128,7 @@ const SaturationLightnessBox = {
 
     // Update
     this._this.updatePicker();
-  }
-}
+  },
+};
 
 export default SaturationLightnessBox;
