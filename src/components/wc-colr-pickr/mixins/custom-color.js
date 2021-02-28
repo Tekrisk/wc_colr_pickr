@@ -3,11 +3,6 @@ const CustomColor = {
 
   // Function to add a new custom color
   addCustomColor: function() {
-    // Limiting a custom color to two rows
-    if (this._this.LSCustomColors[0].length === 19) {
-      this._this.shadowRoot.getElementById('custom_colors_add').style.display = 'none';
-    }
-
     // Getting the color
     const color = `hsla(${this._this.hue}, ${this._this.saturation}%, ${this._this.lightness}%, ${this._this.alpha})`;
 
@@ -20,7 +15,7 @@ const CustomColor = {
     this._this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
 
     // Pushing the color to the top of the array
-    this._this.LSCustomColors[0].unshift(color);
+    this._this.LSCustomColors[0].unshift({value: color});
 
     // Updating the local storage with the new custom color
     localStorage.setItem('custom_colors', JSON.stringify(this._this.LSCustomColors));
@@ -44,7 +39,11 @@ const CustomColor = {
       }
 
       // Pushing the colors to the array
-      this._this.LSCustomColors[0].push(this._this.shadowRoot.querySelectorAll('.custom_colors_preview')[x].getAttribute('data-custom-color'));
+      let element = this._this.shadowRoot.querySelectorAll('.custom_colors_preview')[x];
+      this._this.LSCustomColors[0].push({
+        value: element.getAttribute('data-custom-color'),
+        title: element.getAttribute('title')
+      });
     }
 
     // Updating the local storage

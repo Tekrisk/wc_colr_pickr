@@ -52,7 +52,23 @@ export class WCColrPickr extends HTMLElement {
     this.alpha = 1;
     this.contextMenuElem = null;
     this.doubleTapTime = 0;
-    this.LSCustomColors = { 0: [] };
+    this.LSCustomColors = { 0: [
+      {
+        'value': 'red',
+      }, {
+        'value': 'blue',
+      }, {
+        'value': 'green',
+      }, {
+        'value': 'yellow',
+      }, {
+        'value': 'purple',
+      }, {
+        'value': 'orange',
+      }, {
+        'value': 'lime',
+      }
+    ] };
     UpdatePicker._this = this;
     SaturationLightnessBox._this = this;
     OpacitySlider._this = this;
@@ -175,32 +191,28 @@ export class WCColrPickr extends HTMLElement {
     // Checking if a local storage variable has been set
     if (localStorage.getItem('custom_colors') === null) {
       // If not then I set one
-      localStorage.setItem('custom_colors', '{"0": []}');
+      localStorage.setItem('custom_colors', JSON.stringify(this.LSCustomColors));
     } else {
       // If it has then I define the LSCustomColors with the value for this
       this.LSCustomColors = JSON.parse(localStorage.getItem('custom_colors'));
+    }
+     
+    // Looping through the data to update the DOM with the custom colors
+    for (let x = this.LSCustomColors[0].length - 1; x >= 0; x--) {
+      // Creating the element
+      let customColorElem = document.createElement('BUTTON');
+      customColorElem.className = 'custom_colors_preview';
+      customColorElem.style.background = this.LSCustomColors[0][x].value;
+      customColorElem.setAttribute('data-custom-color', this.LSCustomColors[0][x].value);
+      customColorElem.setAttribute(
+        'title', 
+        this.LSCustomColors[0][x].label ?
+        this.LSCustomColors[0][x].value : 
+        this.LSCustomColors[0][x].value
+      );
 
-      // Looping through the data to update the DOM with the custom colors
-      for (let x = this.LSCustomColors[0].length - 1; x >= 0; x--) {
-        // Creating the element
-        let customColorElem = document.createElement('BUTTON');
-        customColorElem.className = 'custom_colors_preview';
-        customColorElem.style.background = this.LSCustomColors[0][x];
-        customColorElem.setAttribute('data-custom-color', this.LSCustomColors[0][x]);
-
-        // Placing the element in the DOM
-        this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
-
-        // If custom colors have reaches their limit...
-        if (x === 19) {
-          this.shadowRoot.getElementById('custom_colors_add').style.display = 'none'; // Hide add button
-        }
-      }
-
-      // Check whether to display the add color button
-      if (this.LSCustomColors[0].length === 28) {
-        this.shadowRoot.getElementById('custom_colors_add').style.display = 'none';
-      }
+      // Placing the element in the DOM
+      this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
     }
 
     // Adding the object to the elements object
@@ -220,7 +232,7 @@ export class WCColrPickr extends HTMLElement {
       const picker = this.shadowRoot.getElementById('color_picker');
 
       // Displaying the color picker
-      picker.style.display = 'block';
+      picker.style.display = 'grid';
 
       // Find position of button
       let top = this.button.getBoundingClientRect().top;
