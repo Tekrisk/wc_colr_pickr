@@ -37,6 +37,14 @@ export class WCColrPickr extends LitElement {
     return css(scss);
   }
 
+  get button() {
+    if (this.shadowRoot.getElementById('toggle_pickr')) {
+      return this.shadowRoot.getElementById('toggle_pickr');
+    }
+
+    return null;
+  }
+
   /**
    * Creates an instance of WCColrPickr.
    * @memberof WCColrPickr
@@ -45,6 +53,7 @@ export class WCColrPickr extends LitElement {
     super();
     Static.elementInstance++;
 
+    this.initialized = false;
     this.selectedColor = '#ff0000';
     this.pickerOpen = false;
     this.instance = null;
@@ -98,6 +107,14 @@ export class WCColrPickr extends LitElement {
 
   // Render element DOM by returning a `lit-html` template.
   render() {
+    if (!this.initialized && this.button && this.shadowRoot.getElementById('switch_color_type')) {
+      ColorTextValues.connectedCallback();
+      CustomColor.connectedCallback();
+      HueSlider.connectedCallback();
+      OpacitySlider.connectedCallback();
+      SaturationLightnessBox.connectedCallback();
+      this.initialized = true;
+    }
     return this._getTemplate();
   }
 
@@ -121,11 +138,6 @@ export class WCColrPickr extends LitElement {
     }
 
     this.initPickR();
-    ColorTextValues.connectedCallback();
-    CustomColor.connectedCallback();
-    HueSlider.connectedCallback();
-    OpacitySlider.connectedCallback();
-    SaturationLightnessBox.connectedCallback();
   }
 
   /**
@@ -159,26 +171,6 @@ export class WCColrPickr extends LitElement {
       // If it has then I define the LSCustomColors with the value for this
       this.LSCustomColors = JSON.parse(localStorage.getItem('custom_colors'));
     }
-
-    this.button = this.shadowRoot.getElementById('toggle_pickr');
-
-    // Remove outline from tabbing
-    this.shadowRoot.querySelector('.wc-colr-pickr').addEventListener('mousedown', () => {
-      // Define outline element
-      let outlineElements = this.shadowRoot.querySelectorAll('.add_outline');
-
-      // Loop through the array of outline element until they are all gone
-      while (outlineElements.length > 0) {
-        // Remove outline
-        outlineElements[0].classList.add('remove_outline');
-
-        // Remove outline class
-        outlineElements[0].classList.remove('add_outline');
-
-        // Update list
-        outlineElements = this.shadowRoot.querySelectorAll('.add_outline');
-      }
-    });
 
     // Click anywhere to close a pop-up
     window.addEventListener('mousedown', (event) => {
@@ -278,6 +270,10 @@ export class WCColrPickr extends LitElement {
     // Displaying the color picker
     picker.style.display = 'grid';
 
+    if (!this.button) {
+      return;
+    }
+
     // Find position of button
     let top = this.button.getBoundingClientRect().top;
     let left = this.button.getBoundingClientRect().left;
@@ -315,11 +311,28 @@ export class WCColrPickr extends LitElement {
     picker.addEventListener('keydown', this.keyShortcuts.bind(this));
   }
 
+  handleMouseDown() {
+    // Define outline element
+    let outlineElements = this.shadowRoot.querySelectorAll('.add_outline');
+
+    // Loop through the array of outline element until they are all gone
+    while (outlineElements.length > 0) {
+      // Remove outline
+      outlineElements[0].classList.add('remove_outline');
+
+      // Remove outline class
+      outlineElements[0].classList.remove('add_outline');
+
+      // Update list
+      outlineElements = this.shadowRoot.querySelectorAll('.add_outline');
+    }
+  }
+
   _getTemplate() {
     return html`
-      <div class="wc-colr-pickr">
+      <div class="wc-colr-pickr" @mousedown=${this.handleMouseDown}>
         <!-- Add a button to your HTML document and give it any ID -->
-        <button data-color="${this.selectedColor}" style="background-color: ${this.selectedColor}" @click="${this._togglePicker}"></button>
+        <button id="toggle_pickr" data-color="${this.selectedColor}" style="background-color: ${this.selectedColor}" @click="${this._togglePicker}"></button>
         <aside id="color_picker" class="picker-container">
           <div class="picker-main">
             <svg id="color_box" width="263" height="130">
