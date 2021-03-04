@@ -1,89 +1,71 @@
-const SaturationLightnessBox = {
-  _this: null,
+export class SaturationLightnessBox {
+  constructor(_component) {
+    this._component = _component;
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchMove = this.handleTouchMove.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    this.colorBoxHandler = this.colorBoxHandler.bind(this);
+  }
 
-  connectedCallback: function () {
-    this.initSLBEventListeners();
-  },
+  handleMouseDown(event) {
+    // Updating the status in the data object
+    this._component.boxStatus = true;
+    // Calling handler function
+    this.colorBoxHandler(event.pageX, event.pageY);
+  }
 
-  initSLBEventListeners: function () {
-    /**
-     * Mouse Events
-     */
-
-    // Start box drag listener
-    this._this.shadowRoot.getElementById('color_box').addEventListener('mousedown', (event) => {
-      // Updating the status in the data object
-      this._this.boxStatus = true;
+  handleMouseMove(event) {
+    // Checking that the drag has started
+    if (this._component.boxStatus === true) {
       // Calling handler function
       this.colorBoxHandler(event.pageX, event.pageY);
-    });
+    }
+  }
 
-    // Moving box drag listener
-    this._this.shadowRoot.addEventListener('mousemove', (event) => {
-      // Checking that the drag has started
-      if (this._this.boxStatus === true) {
-        // Calling handler function
-        this.colorBoxHandler(event.pageX, event.pageY);
-      }
-    });
+  handleMouseUp() {
+    // Checking that the drag has started
+    if (this._component.boxStatus === true) {
+      // Updating the status in the data object
+      this._component.boxStatus = false;
+    }
+  }
 
-    // End box drag listener
-    this._this.shadowRoot.addEventListener('mouseup', () => {
-      // Checking that the drag has started
-      if (this._this.boxStatus === true) {
-        // Updating the status in the data object
-        this._this.boxStatus = false;
-      }
-    });
+  handleTouchStart(event) {
+    // Updating the status
+    this._component.boxStatusTouch = true;
+    // Calling the handler function
+    this.colorBoxHandler(event.changedTouches[0].clientX, event.changedTouches[0].clientY, true);
+  }
 
-    /**
-     * Touch Events
-     */
-    // Start the box drag on touch
-    this._this.shadowRoot.getElementById('color_box').addEventListener(
-      'touchstart',
-      (event) => {
-        // Updating the status
-        this._this.boxStatusTouch = true;
-        // Calling the handler function
-        this.colorBoxHandler(event.changedTouches[0].clientX, event.changedTouches[0].clientY, true);
-      },
-      { passive: true }
-    );
+  handleTouchMove(event) {
+    // Checking that the touch drag has started
+    if (this._component.boxStatusTouch === true) {
+      // Prevent page scrolling
+      event.preventDefault();
+      // Calling the handler function
+      this.colorBoxHandler(event.changedTouches[0].clientX, event.changedTouches[0].clientY, true);
+    }
+  }
 
-    // Moving the box drag on touch
-    this._this.shadowRoot.addEventListener(
-      'touchmove',
-      (event) => {
-        // Checking that the touch drag has started
-        if (this._this.boxStatusTouch === true) {
-          // Prevent page scrolling
-          event.preventDefault();
-          // Calling the handler function
-          this.colorBoxHandler(event.changedTouches[0].clientX, event.changedTouches[0].clientY, true);
-        }
-      },
-      { passive: false }
-    );
-
-    // End box drag on touch
-    this._this.shadowRoot.addEventListener('touchend', () => {
-      // Checking that the touch drag has started
-      if (this._this.boxStatusTouch === true) {
-        // Calling the handler function
-        this._this.boxStatusTouch = false;
-      }
-    });
-  },
+  handleTouchEnd() {
+    // Checking that the touch drag has started
+    if (this._component.boxStatusTouch === true) {
+      // Calling the handler function
+      this._component.boxStatusTouch = false;
+    }
+  }
 
   /**
    * Saturation and Lightness Box
    */
   // Function to handle changes to the saturation and lightness box
-  colorBoxHandler: function (positionX, positionY, touch) {
+  colorBoxHandler(positionX, positionY, touch) {
     // Defining the box and dragger
-    const boxContainer = this._this.shadowRoot.getElementById('color_box');
-    const boxDragger = this._this.shadowRoot.getElementById('box_dragger');
+    const boxContainer = this._component.shadowRoot.getElementById('color_box');
+    const boxDragger = this._component.shadowRoot.getElementById('box_dragger');
 
     // Defining X and Y position, Y differently works with scroll so I make conditions for that
     let eventX = positionX - boxContainer.getBoundingClientRect().left;
@@ -116,19 +98,17 @@ const SaturationLightnessBox = {
     const LPercent = Math.floor((percentY / 100) * percentX);
 
     // Applying the Saturation and Lightness to the data object
-    this._this.saturation = SPercent;
-    this._this.lightness = LPercent;
+    this._component.saturation = SPercent;
+    this._component.lightness = LPercent;
 
     // Update the color text values
-    this._this.updateColorValueInput();
+    this._component.UpdatePicker.updateColorValueInput();
 
     // Setting the data-color attribute to a color string
     // This is so that the color updates properly on instances where the color has not been set
-    this._this.setAttribute('data-color', 'color');
+    this._component.setAttribute('data-color', 'color');
 
     // Update
-    this._this.updatePicker();
-  },
-};
-
-export default SaturationLightnessBox;
+    this._component.updatePicker();
+  }
+}

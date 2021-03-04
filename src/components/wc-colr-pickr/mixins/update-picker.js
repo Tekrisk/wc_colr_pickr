@@ -1,10 +1,14 @@
 import { hexAToRGBA, RGBAToHSLA, HSLAToRGBA } from '../utility/color-conversion';
 
-const UpdatePicker = {
-  _this: null,
+export class UpdatePicker {
+  constructor(_component) {
+    this._component = _component;
+    this.updateColorDisplays = this.updateColorDisplays.bind(this);
+    this.updateColorValueInput = this.updateColorValueInput.bind(this);
+  }
 
   // Function to update color displays
-  updateColorDisplays: function (color) {
+  updateColorDisplays(color) {
     let uColor = color;
 
     // Checking if color picker has not been set
@@ -21,7 +25,7 @@ const UpdatePicker = {
       if (uColor.substring(0, 1) === '#') {
         // Converting the color to HSLA
         uColor = hexAToRGBA(uColor, true);
-      } else if (uColor.substring(0, 1) === 'r') {
+      } else if (uColor.match(/rgba?/)) {
         // Extracting the values
         const rgb = uColor.match(/[.?\d]+/g);
 
@@ -34,34 +38,45 @@ const UpdatePicker = {
         // Extracting the values
         const hsl = uColor.match(/[.?\d]+/g);
 
-        // Making sure there is a alpha value
-        hsl[3] = hsl[3] === undefined ? 1 : hsl[3];
+        if (hsl) { // undefined if we have no color yet
+          // Making sure there is a alpha value
+          hsl[3] = hsl[3] === undefined ? 1 : hsl[3];
 
-        // Formatting the value properly
-        uColor = {
-          h: hsl[0],
-          s: hsl[1],
-          l: hsl[2],
-          a: hsl[3],
-        };
+          // Formatting the value properly
+          uColor = {
+            h: hsl[0],
+            s: hsl[1],
+            l: hsl[2],
+            a: hsl[3],
+          };
+        } else { // try to get color from text
+          let a = document.createElement('div');
+          a.style.color = uColor;
+          let colors = window.getComputedStyle(this._component.shadowRoot.appendChild(a) ).color.match(/\d+/g).map((a) => parseInt(a,10));
+          this._component.shadowRoot.removeChild(a);
+          if (colors.length >= 3) {
+            uColor = '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1);
+            uColor = hexAToRGBA(uColor, true);
+          }
+        }
       }
     }
 
     // Updating the data object
-    this._this.hue = uColor.h;
-    this._this.saturation = uColor.s;
-    this._this.lightness = uColor.l;
-    this._this.alpha = uColor.a;
+    this._component.hue = uColor.h;
+    this._component.saturation = uColor.s;
+    this._component.lightness = uColor.l;
+    this._component.alpha = uColor.a;
 
     // Updating the input values
     this.updateColorValueInput();
 
     // Updating the Hue color in the Saturation and lightness box
-    this._this.shadowRoot.getElementById('saturation').children[1].setAttribute('stop-color', `hsl(${uColor.h}, 100%, 50%)`);
+    this._component.shadowRoot.getElementById('saturation').children[1].setAttribute('stop-color', `hsl(${uColor.h}, 100%, 50%)`);
 
     // Color box (saturation and lightness) config
     // Defining the box and dragger
-    const boxDragger = this._this.shadowRoot.getElementById('box_dragger');
+    const boxDragger = this._component.shadowRoot.getElementById('box_dragger');
 
     // Calculating x value
     let x = (238 / 100) * uColor.s + 14;
@@ -85,7 +100,7 @@ const UpdatePicker = {
 
     // Hue slider config
     // Defining the hue slider and dragger
-    const hueSliderDragger = this._this.shadowRoot.getElementById('color_slider_dragger');
+    const hueSliderDragger = this._component.shadowRoot.getElementById('color_slider_dragger');
 
     // Calculating x value
     let percentHue = 100 - (uColor.h / 359) * 100;
@@ -96,41 +111,39 @@ const UpdatePicker = {
 
     // Alpha slider config
     // Defining the opacity slider and dragger
-    const alphaSliderDragger = this._this.shadowRoot.getElementById('opacity_slider_dragger');
+    const alphaSliderDragger = this._component.shadowRoot.getElementById('opacity_slider_dragger');
 
     // Calculating x value
     let alphaX = (244 / 100) * (uColor.a * 100) + 11;
 
     // Making changes the the UI
     alphaSliderDragger.attributes.x.nodeValue = alphaX;
-  },
+  }
 
   // Update the color value inputs
-  updateColorValueInput: function () {
+  updateColorValueInput() {
     // Checking the value color type the user has selected
-    if (this._this.colorTypeStatus === 'HEXA') {
+    if (this._component.colorTypeStatus === 'HEXA') {
       // Converting the value
-      const hexValue = HSLAToRGBA(this._this.hue, this._this.saturation, this._this.lightness, this._this.alpha, true);
+      const hexValue = HSLAToRGBA(this._component.hue, this._component.saturation, this._component.lightness, this._component.alpha, true);
 
       // Applying the value to the input
-      this._this.shadowRoot.getElementById('hex_input').value = hexValue;
-    } else if (this._this.colorTypeStatus === 'RGBA') {
+      this._component.shadowRoot.getElementById('hex_input').value = hexValue;
+    } else if (this._component.colorTypeStatus === 'RGBA') {
       // Converting the value
-      const RGBAValue = HSLAToRGBA(this._this.hue, this._this.saturation, this._this.lightness, this._this.alpha);
+      const RGBAValue = HSLAToRGBA(this._component.hue, this._component.saturation, this._component.lightness, this._component.alpha);
 
       // Applying the value to the inputs
-      this._this.shadowRoot.querySelectorAll('.rgba_input')[0].value = RGBAValue.r;
-      this._this.shadowRoot.querySelectorAll('.rgba_input')[1].value = RGBAValue.g;
-      this._this.shadowRoot.querySelectorAll('.rgba_input')[2].value = RGBAValue.b;
-      this._this.shadowRoot.querySelectorAll('.rgba_input')[3].value = RGBAValue.a;
+      this._component.shadowRoot.querySelectorAll('.rgba_input')[0].value = RGBAValue.r;
+      this._component.shadowRoot.querySelectorAll('.rgba_input')[1].value = RGBAValue.g;
+      this._component.shadowRoot.querySelectorAll('.rgba_input')[2].value = RGBAValue.b;
+      this._component.shadowRoot.querySelectorAll('.rgba_input')[3].value = RGBAValue.a;
     } else {
       // Applying the value to the inputs
-      this._this.shadowRoot.querySelectorAll('.hsla_input')[0].value = this._this.hue;
-      this._this.shadowRoot.querySelectorAll('.hsla_input')[1].value = this._this.saturation;
-      this._this.shadowRoot.querySelectorAll('.hsla_input')[2].value = this._this.lightness;
-      this._this.shadowRoot.querySelectorAll('.hsla_input')[3].value = this._this.alpha;
+      this._component.shadowRoot.querySelectorAll('.hsla_input')[0].value = this._component.hue;
+      this._component.shadowRoot.querySelectorAll('.hsla_input')[1].value = this._component.saturation;
+      this._component.shadowRoot.querySelectorAll('.hsla_input')[2].value = this._component.lightness;
+      this._component.shadowRoot.querySelectorAll('.hsla_input')[3].value = this._component.alpha;
     }
-  },
-};
-
-export default UpdatePicker;
+  }
+}

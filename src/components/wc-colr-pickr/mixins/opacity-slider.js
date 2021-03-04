@@ -1,90 +1,71 @@
-const OpacitySlider = {
-  _this: null,
+export class OpacitySlider {
+  constructor(_component) {
+    this._component = _component;
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchMove = this.handleTouchMove.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+  }
 
-  connectedCallback: function () {
-    this.initOSEventListeners();
-  },
+  handleMouseDown(event) {
+    // Updating the status in the data object
+    this._component.opacityStatus = true;
+    // Calling the handler function
+    this.opacitySliderHandler(event.pageX);
+  }
 
-  initOSEventListeners: function () {
-    /**
-     * Mouse Events
-     */
-    // Start the slider drag for opacity
-    this._this.shadowRoot.getElementById('opacity_slider').addEventListener('mousedown', (event) => {
-      // Updating the status in the data object
-      this._this.opacityStatus = true;
+  handleMouseMove(event) {
+    // Checking that the drag has started
+    if (this._component.opacityStatus === true) {
       // Calling the handler function
       this.opacitySliderHandler(event.pageX);
-    });
+    }
+  }
 
-    // Moving the slider drag for opacity
-    this._this.shadowRoot.addEventListener('mousemove', (event) => {
-      // Checking that the drag has started
-      if (this._this.opacityStatus === true) {
-        // Calling the handler function
-        this.opacitySliderHandler(event.pageX);
-      }
-    });
+  handleMouseUp() {
+    // Checking that the drag has started
+    if (this._component.opacityStatus === true) {
+      // Updating the status in the data object
+      this._component.opacityStatus = false;
+    }
+  }
 
-    // End the slider drag
-    this._this.shadowRoot.addEventListener('mouseup', () => {
-      // Checking that the drag has started
-      if (this._this.opacityStatus === true) {
-        // Updating the status in the data object
-        this._this.opacityStatus = false;
-      }
-    });
+  handleTouchStart(event) {
+    // Updating the status
+    this._component.opacityStatusTouch = true;
+    // Calling the handler function
+    this.opacitySliderHandler(event.changedTouches[0].clientX);
+  }
 
-    /**
-     * Touch Events
-     */
+  handleTouchMove(event) {
+    // Checking that the touch drag has started
+    if (this._component.opacityStatusTouch === true) {
+      // Prevent page scrolling
+      event.preventDefault();
+      // Calling the handler function
+      this.opacitySliderHandler(event.changedTouches[0].clientX);
+    }
+  }
 
-    // Start the slider drag on touch
-    this._this.shadowRoot.getElementById('opacity_slider').addEventListener(
-      'touchstart',
-      (event) => {
-        // Updating the status
-        this._this.opacityStatusTouch = true;
-        // Calling the handler function
-        this.opacitySliderHandler(event.changedTouches[0].clientX);
-      },
-      { passive: true }
-    );
-
-    // Moving the slider drag on touch
-    this._this.shadowRoot.addEventListener(
-      'touchmove',
-      (event) => {
-        // Checking that the touch drag has started
-        if (this._this.opacityStatusTouch === true) {
-          // Prevent page scrolling
-          event.preventDefault();
-          // Calling the handler function
-          this.opacitySliderHandler(event.changedTouches[0].clientX);
-        }
-      },
-      { passive: false }
-    );
-
-    // End the slider drag on touch
-    this._this.shadowRoot.addEventListener('touchend', () => {
-      // Checking that the touch drag has started
-      if (this._this.opacityStatusTouch === true) {
-        // Updating the status
-        this._this.opacityStatusTouch = false;
-      }
-    });
-  },
+  handleTouchEnd() {
+    // Checking that the touch drag has started
+    if (this._component.opacityStatusTouch === true) {
+      // Updating the status
+      this._component.opacityStatusTouch = false;
+    }
+  }
 
   /**
    * Opacity Slider
    */
 
   // Function to handle changes to the opacity slider
-  opacitySliderHandler: function (position) {
+  opacitySliderHandler(position) {
     // Defining the slider and dragger
-    const sliderContainer = this._this.shadowRoot.getElementById('opacity_slider');
-    const sliderDragger = this._this.shadowRoot.getElementById('opacity_slider_dragger');
+    const sliderContainer = this._component.shadowRoot.getElementById('opacity_slider');
+    const sliderDragger = this._component.shadowRoot.getElementById('opacity_slider_dragger');
 
     // Defining the X position
     let eventX = position - sliderContainer.getBoundingClientRect().left;
@@ -106,18 +87,16 @@ const OpacitySlider = {
     alpha = Number(Math.round(alpha + 'e' + 2) + 'e-' + 2);
 
     // Updating the data objects
-    this._this.alpha = alpha;
+    this._component.alpha = alpha;
 
     // Update the color text values
-    this._this.updateColorValueInput();
+    this._component.UpdatePicker.updateColorValueInput();
 
     // Setting the data-color attribute to a color string
     // This is so that the color updates properly on instances where the color has not been set
-    this._this.setAttribute('data-color', 'color');
+    this._component.setAttribute('data-color', 'color');
 
     // Update
-    this._this.updatePicker();
-  },
-};
-
-export default OpacitySlider;
+    this._component.updatePicker();
+  }
+}

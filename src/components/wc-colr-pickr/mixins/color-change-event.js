@@ -1,7 +1,10 @@
 import { hexAToRGBA, HSLAToRGBA } from '../utility/color-conversion';
 
-const ColorChangeEvent = {
-  _this: null,
+export class ColorChangeEvent {
+  constructor(_component) {
+    this._component = _component;
+    this.colorChange = this.colorChange.bind(this);
+  }
 
   /**
    * @memberof WCColrPickr
@@ -12,9 +15,9 @@ const ColorChangeEvent = {
    *
    * @example
    * const button = document.getElementById('my_button');
-   * this._this.colorChange('#ff0000', button);
+   * this._component.colorChange('#ff0000', button);
    */
-  colorChange: function (color) {
+  colorChange(color) {
     let _color = color;
 
     // If the user send a string manually...
@@ -54,12 +57,10 @@ const ColorChangeEvent = {
 
     // Defining color
     // Changing color attributes
-    this._this.button.setAttribute('data-color', hex);
-    this._this.button.style.background = hex;
+    this._component.button.setAttribute('data-color', hex);
+    this._component.button.style.background = hex;
 
     // Dispatching the event for the active object
-    this._this.shadowRoot.dispatchEvent(event);
-  },
-};
-
-export default ColorChangeEvent;
+    this._component.shadowRoot.dispatchEvent(event);
+  }
+}

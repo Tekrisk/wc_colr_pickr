@@ -1,10 +1,17 @@
-const CustomColor = {
-  _this: null,
+export class CustomColor {
+  constructor(_component) {
+    this._component = _component;
+    this.addCustomColor = this.addCustomColor.bind(this);
+    this.contextCustomColor = this.contextCustomColor.bind(this);
+    this.clearSingleCustomColor = this.clearSingleCustomColor.bind(this);
+    this.clearAllCustomColors = this.clearAllCustomColors.bind(this);
+    this.selectCustomColor = this.selectCustomColor.bind(this);
+  }
 
   // Function to add a new custom color
-  addCustomColor: function () {
+  addCustomColor() {
     // Getting the color
-    const color = `hsla(${this._this.hue}, ${this._this.saturation}%, ${this._this.lightness}%, ${this._this.alpha})`;
+    const color = `hsla(${this._component.hue}, ${this._component.saturation}%, ${this._component.lightness}%, ${this._component.alpha})`;
 
     // Creating the element
     let customColorElem = document.createElement('BUTTON');
@@ -12,112 +19,95 @@ const CustomColor = {
     customColorElem.style.background = color;
     customColorElem.setAttribute('data-custom-color', color);
     // Placing the element in the DOM
-    this._this.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
+    this._component.shadowRoot.getElementById('custom_colors_box').appendChild(customColorElem);
 
     // Pushing the color to the top of the array
-    this._this.LSCustomColors[0].unshift({ value: color });
+    this._component.LSCustomColors[0].unshift({ value: color });
 
     // Updating the local storage with the new custom color
-    localStorage.setItem('custom_colors', JSON.stringify(this._this.LSCustomColors));
-  },
+    localStorage.setItem('custom_colors', JSON.stringify(this._component.LSCustomColors));
+  }
 
   // Clears a selected custom color
-  clearSingleCustomColor: function (element) {
-    const elemToRemove = element === undefined ? this._this.contextMenuElem : element;
+  clearSingleCustomColor(_element) {
+    const elemToRemove = _element === undefined ? this._component.contextMenuElem : _element;
 
     // Removing the element
-    this._this.shadowRoot.getElementById('custom_colors_box').removeChild(elemToRemove);
+    this._component.shadowRoot.getElementById('custom_colors_box').removeChild(elemToRemove);
 
     // Clearing the variable
-    this._this.LSCustomColors = { 0: [] };
+    this._component.LSCustomColors = { 0: [] };
 
     // Looping through the custom colors to repopulate the variable
-    for (let x in this._this.shadowRoot.querySelectorAll('.custom_colors_preview')) {
+    for (let x in this._component.shadowRoot.querySelectorAll('.custom_colors_preview')) {
       // Continuing if its a number
       if (isNaN(x) === true) {
         continue;
       }
 
       // Pushing the colors to the array
-      let element = this._this.shadowRoot.querySelectorAll('.custom_colors_preview')[x];
-      this._this.LSCustomColors[0].push({
-        value: element.getAttribute('data-custom-color'),
-        title: element.getAttribute('title'),
+      let el = this._component.shadowRoot.querySelectorAll('.custom_colors_preview')[x];
+      this._component.LSCustomColors[0].push({
+        value: el.getAttribute('data-custom-color'),
+        title: el.getAttribute('title'),
       });
     }
 
     // Updating the local storage
-    localStorage.setItem('custom_colors', JSON.stringify(this._this.LSCustomColors));
+    localStorage.setItem('custom_colors', JSON.stringify(this._component.LSCustomColors));
 
     // Making sure the add color button is displaying
-    this._this.shadowRoot.getElementById('custom_colors_add').style.display = 'inline-block';
-  },
+    this._component.shadowRoot.getElementById('custom_colors_add').style.display = 'inline-block';
+  }
 
   // Clears all custom colors
-  clearAllCustomColors: function () {
+  clearAllCustomColors() {
     // Clearing variable
-    this._this.LSCustomColors = { 0: [] };
+    this._component.LSCustomColors = { 0: [] };
 
     // Looping through the custom colors to repopulate the variable
-    while (this._this.shadowRoot.querySelectorAll('.custom_colors_preview').length > 0) {
-      this._this.shadowRoot.getElementById('custom_colors_box').removeChild(this._this.shadowRoot.querySelectorAll('.custom_colors_preview')[0]);
+    while (this._component.shadowRoot.querySelectorAll('.custom_colors_preview').length > 0) {
+      this._component.shadowRoot.getElementById('custom_colors_box').removeChild(this._component.shadowRoot.querySelectorAll('.custom_colors_preview')[0]);
     }
 
     // Updating the local storage
-    localStorage.setItem('custom_colors', JSON.stringify(this._this.LSCustomColors));
+    localStorage.setItem('custom_colors', JSON.stringify(this._component.LSCustomColors));
 
     // Making sure the add color button is displaying
-    this._this.shadowRoot.getElementById('custom_colors_add').style.display = 'inline-block';
-  },
+    this._component.shadowRoot.getElementById('custom_colors_add').style.display = 'inline-block';
+  }
 
-  connectedCallback: function () {
-    // Click on color listener to update the picker
-    this._this.shadowRoot.getElementById('custom_colors_box').addEventListener('click', (event) => {
-      // Making sure the users has selected a color preview
-      if (event.target.className === 'custom_colors_preview') {
-        // Color
-        const color = event.target.getAttribute('data-custom-color');
+  selectCustomColor(event) {
+    console.error(this, event.target.getAttribute('data-custom-color'));
+    // Making sure the users has selected a color preview
+    if (event.target.className === 'custom_colors_preview') {
+      // Color
+      const color = event.target.getAttribute('data-custom-color');
 
-        // Updating the picker with that color
-        this._this.updateColorDisplays(color);
+      // Updating the picker with that color
+      this._component.UpdatePicker.updateColorDisplays(color);
 
-        // Update
-        this._this.updatePicker();
-      }
-    });
+      // Update
+      this._component.updatePicker();
+    }
+  }
 
-    this._this.shadowRoot.getElementById('custom_colors_add').addEventListener('click', () => {
-      this.addCustomColor();
-    });
+  contextCustomColor(event) {
+    // Making sure the users has selected a color preview
+    if (event.target.className === 'custom_colors_preview') {
+      // Preventing default
+      event.preventDefault();
 
-    // Event to fire for a context menu
-    this._this.shadowRoot.getElementById('custom_colors_box').addEventListener('contextmenu', (event) => {
-      // Making sure the users has selected a color preview
-      if (event.target.className === 'custom_colors_preview') {
-        // Preventing default
-        event.preventDefault();
+      // Defining the context menu
+      const contextMenu = this._component.shadowRoot.getElementById('color_context_menu');
 
-        // Defining the context menu
-        const contextMenu = this._this.shadowRoot.getElementById('color_context_menu');
+      // Updating the styling of the menu
+      contextMenu.style.display = 'block';
+      contextMenu.style.top = event.target.getBoundingClientRect().top + 25 + 'px';
+      contextMenu.style.left = event.target.getBoundingClientRect().left + 'px';
 
-        // Updating the styling of the menu
-        contextMenu.style.display = 'block';
-        contextMenu.style.top = event.target.getBoundingClientRect().top + 25 + 'px';
-        contextMenu.style.left = event.target.getBoundingClientRect().left + 'px';
-
-        // Defining the color selected
-        this._this.contextMenuElem = event.target;
-      }
-    });
-
-    this._this.shadowRoot.getElementById('color_clear_single').addEventListener('mousedown', () => {
-      this.clearSingleCustomColor();
-    });
-
-    this._this.shadowRoot.getElementById('color_clear_all').addEventListener('mousedown', () => {
-      this.clearAllCustomColors();
-    });
-  },
-};
-
-export default CustomColor;
+      // Defining the color selected
+      this._component.contextMenuElem = event.target;
+    }
+  }
+}

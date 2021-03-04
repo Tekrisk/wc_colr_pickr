@@ -1,85 +1,68 @@
-const HueSlider = {
-  _this: null,
+export class HueSlider {
+  constructor(_component) {
+    this._component = _component;
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchMove = this.handleTouchMove.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    this.colorSliderHandler = this.colorSliderHandler.bind(this);
+  }
 
-  connectedCallback: function () {
-    this.initHSEventListeners();
-  },
+  handleMouseDown(event) {
+    // Updating the status in the data object
+    this._component.sliderStatus = true;
+    // Calling handler function
+    this.colorSliderHandler(event.pageX);
+  }
 
-  initHSEventListeners: function () {
-    /**
-     * Mouse Events
-     */
-    // Start the slider drag
-    this._this.shadowRoot.getElementById('color_slider').addEventListener('mousedown', (event) => {
-      // Updating the status in the data object
-      this._this.sliderStatus = true;
+  handleMouseMove(event) {
+    // Checking that the drag has started
+    if (this._component.sliderStatus === true) {
       // Calling handler function
       this.colorSliderHandler(event.pageX);
-    });
+    }
+  }
 
-    // Moving the slider drag
-    this._this.shadowRoot.addEventListener('mousemove', (event) => {
-      // Checking that the drag has started
-      if (this._this.sliderStatus === true) {
-        // Calling handler function
-        this.colorSliderHandler(event.pageX);
-      }
-    });
+  handleMouseUp() {
+    // Checking that the drag has started
+    if (this._component.sliderStatus === true) {
+      // Updating the status in the data object
+      this._component.sliderStatus = false;
+    }
+  }
 
-    // End the slider drag
-    this._this.shadowRoot.addEventListener('mouseup', () => {
-      // Checking that the drag has started
-      if (this._this.sliderStatus === true) {
-        // Updating the status in the data object
-        this._this.sliderStatus = false;
-      }
-    });
+  handleTouchStart(event) {
+    // Updating the status
+    this._component.sliderStatusTouch = true;
+    // Calling the handler function
+    this.colorSliderHandler(event.changedTouches[0].clientX);
+  }
 
-    /**
-     * Touch Events
-     */
-    // Start the slider drag on touch
-    this._this.shadowRoot.getElementById('color_slider').addEventListener(
-      'touchstart',
-      (event) => {
-        // Updating the status
-        this._this.sliderStatusTouch = true;
-        // Calling the handler function
-        this.colorSliderHandler(event.changedTouches[0].clientX);
-      },
-      { passive: true }
-    );
+  handleTouchMove() {
+    // Checking that the touch drag has started
+    if (this._component.sliderStatusTouch === true) {
+      // Prevent page scrolling
+      event.preventDefault();
+      // Calling the handler function
+      this.colorSliderHandler(event.changedTouches[0].clientX);
+    }
+  }
 
-    // Moving the slider drag on touch
-    this._this.shadowRoot.addEventListener(
-      'touchmove',
-      () => {
-        // Checking that the touch drag has started
-        if (this._this.sliderStatusTouch === true) {
-          // Prevent page scrolling
-          event.preventDefault();
-          // Calling the handler function
-          this.colorSliderHandler(event.changedTouches[0].clientX);
-        }
-      },
-      { passive: false }
-    );
-
-    // End the slider drag on touch
-    this._this.shadowRoot.addEventListener('touchend', () => {
-      // Checking that the touch drag has started
-      if (this._this.sliderStatusTouch === true) {
-        // Updating the status
-        this._this.sliderStatusTouch = false;
-      }
-    });
-  },
+  handleTouchEnd() {
+    // Checking that the touch drag has started
+    if (this._component.sliderStatusTouch === true) {
+      // Updating the status
+      this._component.sliderStatusTouch = false;
+    }
+  }
 
   // Function to handle changes to the HUE slider
-  colorSliderHandler: function (position) {
+  colorSliderHandler(position) {
     // Defining the slider and dragger
-    const sliderContainer = this._this.shadowRoot.getElementById('color_slider');
-    const sliderDragger = this._this.shadowRoot.getElementById('color_slider_dragger');
+    const sliderContainer = this._component.shadowRoot.getElementById('color_slider');
+    const sliderDragger = this._component.shadowRoot.getElementById('color_slider_dragger');
 
     // Defining the X position
     let eventX = position - sliderContainer.getBoundingClientRect().left;
@@ -101,21 +84,19 @@ const HueSlider = {
     const HColor = Math.round(359 - (359 / 100) * percent);
 
     // Updating the Hue value in the data object
-    this._this.hue = HColor;
+    this._component.hue = HColor;
 
     // Updating the Hue color in the Saturation and lightness box
-    this._this.shadowRoot.getElementById('saturation').children[1].setAttribute('stop-color', `hsla(${HColor}, 100%, 50%, ${this._this.alpha})`);
+    this._component.shadowRoot.getElementById('saturation').children[1].setAttribute('stop-color', `hsla(${HColor}, 100%, 50%, ${this._component.alpha})`);
 
     // Update the color text values
-    this._this.updateColorValueInput();
+    this._component.UpdatePicker.updateColorValueInput();
 
     // Setting the data-color attribute to a color string
     // This is so that the color updates properly on instances where the color has not been set
-    this._this.setAttribute('data-color', 'color');
+    this._component.setAttribute('data-color', 'color');
 
     // Update
-    this._this.updatePicker();
-  },
-};
-
-export default HueSlider;
+    this._component.updatePicker();
+  }
+}
