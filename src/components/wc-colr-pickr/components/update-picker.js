@@ -71,13 +71,6 @@ export class UpdatePicker {
     // Updating the input values
     this.updateColorValueInput();
 
-    // Updating the Hue color in the Saturation and lightness box
-    this._component.shadowRoot.getElementById('saturation').children[1].setAttribute('stop-color', `hsl(${uColor.h}, 100%, 50%)`);
-
-    // Color box (saturation and lightness) config
-    // Defining the box and dragger
-    const boxDragger = this._component.shadowRoot.getElementById('box_dragger');
-
     // Calculating x value
     let x = (238 / 100) * uColor.s + 14;
 
@@ -95,29 +88,14 @@ export class UpdatePicker {
     if (y > 119) y = 119;
 
     // Making changes the the UI
-    boxDragger.attributes.x.nodeValue = x;
-    boxDragger.attributes.y.nodeValue = y;
-
-    // Hue slider config
-    // Defining the hue slider and dragger
-    const hueSliderDragger = this._component.shadowRoot.getElementById('color_slider_dragger');
+    this._component.boxX = x;
+    this._component.boxY = y;
 
     // Calculating x value
-    let percentHue = 100 - (uColor.h / 359) * 100;
-    let hueX = (244 / 100) * percentHue + 11;
-
-    // Making changes the the UI
-    hueSliderDragger.attributes.x.nodeValue = hueX;
-
-    // Alpha slider config
-    // Defining the opacity slider and dragger
-    const alphaSliderDragger = this._component.shadowRoot.getElementById('opacity_slider_dragger');
+    this._component.hueX = (244 / 100) * (100 - (uColor.h / 359) * 100) + 11;
 
     // Calculating x value
-    let alphaX = (244 / 100) * (uColor.a * 100) + 11;
-
-    // Making changes the the UI
-    alphaSliderDragger.attributes.x.nodeValue = alphaX;
+    this._component.alphaX = (244 / 100) * (uColor.a * 100) + 11;
   }
 
   // Update the color value inputs

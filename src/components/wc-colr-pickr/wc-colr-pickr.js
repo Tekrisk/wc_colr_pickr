@@ -1,12 +1,12 @@
 import { LitElement, html, css } from 'lit-element';
 import scss from './wc-colr-pickr.scss';
-import { ColorChangeEvent } from './mixins/color-change-event';
-import { ColorTextValues } from './mixins/color-text-values';
-import { CustomColor } from './mixins/custom-color';
-import { HueSlider } from './mixins/hue-slider';
-import { OpacitySlider } from './mixins/opacity-slider';
-import { SaturationLightnessBox } from './mixins/saturation-lightness-box';
-import { UpdatePicker } from './mixins/update-picker';
+import { ColorChangeEvent } from './components/color-change-event';
+import { ColorTextValues } from './components/color-text-values';
+import './components/custom-colors';
+import './components/hue-slider';
+import './components/opacity-slider';
+import './components/saturation-lightness-box';
+import { UpdatePicker } from './components/update-picker';
 
 /**
  * Private properties used inside the module.
@@ -30,6 +30,14 @@ export class WCColrPickr extends LitElement {
   static get properties() {
     return {
       selectedColor: { type: String },
+      hue: { type: Number },
+      hueX: { type: Number },
+      saturation: { type: Number },
+      lightness: { type: Number },
+      alpha: { type: Number },
+      alphaX: { type: Number },
+      boxX: { type: Number },
+      boxY: { type: Number },
     };
   }
 
@@ -45,6 +53,26 @@ export class WCColrPickr extends LitElement {
     return null;
   }
 
+  get hueSlider() {
+    return this.shadowRoot.querySelector('hue-slider');
+  }
+
+  get opacitySlider() {
+    return this.shadowRoot.querySelector('opacity-slider');
+  }
+
+  get saturationLightnessBox() {
+    return this.shadowRoot.querySelector('saturation-lightness-box');
+  }
+
+  get colorSliderContainer() {
+    return this.shadowRoot.getElementById('color_slider');
+  }
+
+  get colorSliderDragger() {
+    return this.shadowRoot.getElementById('color_slider_dragger');
+  }
+
   /**
    * Creates an instance of WCColrPickr.
    * @memberof WCColrPickr
@@ -53,23 +81,24 @@ export class WCColrPickr extends LitElement {
     super();
     Static.elementInstance++;
 
+    this.alpha = 1;
+    this.hue = 0;
+    this.hueX = 255;
+    this.alphaX = 255;
+    this.boxX = 336;
+    this.boxY = 14;
+
     this.selectedColor = '#ff0000';
     this.pickerOpen = false;
     this.instance = null;
     this.boxStatus = false;
     this.boxStatusTouch = false;
-    this.sliderStatus = false;
-    this.sliderStatusTouch = false;
-    this.opacityStatus = false;
-    this.opacityStatusTouch = false;
     this.colorTypeStatus = 'HEXA';
-    this.hue = 0;
     this.saturation = 100;
     this.lightness = 50;
-    this.alpha = 1;
     this.contextMenuElem = null;
     this.doubleTapTime = 0;
-    this.LSCustomColors = {
+    this.customColors = {
       0: [
         {
           value: 'red',
@@ -95,20 +124,15 @@ export class WCColrPickr extends LitElement {
       ],
     };
     this.UpdatePicker = new UpdatePicker(this);
-    this.SaturationLightnessBox = new SaturationLightnessBox(this);
-    this.OpacitySlider = new OpacitySlider(this);
     this.ColorChangeEvent = new ColorChangeEvent(this);
-    this.CustomColor = new CustomColor(this);
     this.ColorTextValues = new ColorTextValues(this);
-    this.HueSlider = new HueSlider(this);
     this._togglePicker = this._togglePicker.bind(this);
     this._rootMouseMove = this._rootMouseMove.bind(this);
     this._rootMouseUp = this._rootMouseUp.bind(this);
-    this._rootTouchMove = this._rootTouchMove.bind(this);
+    this._rootTouchMoveevent = this._rootTouchMoveevent.bind(this);
     this._rootTouchEnd = this._rootTouchEnd.bind(this);
   }
 
-  // Render element DOM by returning a `lit-html` template.
   render() {
     return this._getTemplate();
   }
@@ -151,12 +175,12 @@ export class WCColrPickr extends LitElement {
 
   initPickR() {
     // Checking if a local storage variable has been set
-    if (localStorage.getItem('custom_colors') === null) {
+    if (localStorage.getItem('colrpickr_custom_colors') === null) {
       // If not then I set one
-      localStorage.setItem('custom_colors', JSON.stringify(this.LSCustomColors));
+      localStorage.setItem('colrpickr_custom_colors', JSON.stringify(this.customColors));
     } else {
-      // If it has then I define the LSCustomColors with the value for this
-      this.LSCustomColors = JSON.parse(localStorage.getItem('custom_colors'));
+      // If it has then I define the CustomColors with the value for this
+      this.customColors = JSON.parse(localStorage.getItem('colrpickr_custom_colors'));
     }
 
     // Click anywhere to close a pop-up
@@ -169,11 +193,41 @@ export class WCColrPickr extends LitElement {
 
     // Click the darken background to close the color picker
     window.addEventListener('mousedown', (event) => {
-      // Define the target
-      let target = event.target;
       // close if picker is open and target is picker tag...
-      if (this.pickerOpen && target.tagName !== 'WC-COLR-PICKR') {
+      if (this.pickerOpen && event.target.tagName !== 'WC-COLR-PICKR') {
         this.closePicker();
+      }
+    });
+
+    // Click the darken background to close the color picker
+    window.addEventListener('mousemove', (event) => {
+      // close if picker is open and target is picker tag...
+      if (this.pickerOpen && event.target.tagName !== 'WC-COLR-PICKR') {
+        this._rootMouseMove(event);
+      }
+    });
+
+    // Click the darken background to close the color picker
+    window.addEventListener('mouseup', (event) => {
+      // close if picker is open and target is picker tag...
+      if (this.pickerOpen && event.target.tagName !== 'WC-COLR-PICKR') {
+        this._rootMouseUp(event);
+      }
+    });
+
+    // Click the darken background to close the color picker
+    window.addEventListener('touchmove', (event) => {
+      // close if picker is open and target is picker tag...
+      if (this.pickerOpen && event.target.tagName !== 'WC-COLR-PICKR') {
+        this._rootTouchMove(event);
+      }
+    });
+
+    // Click the darken background to close the color picker
+    window.addEventListener('touchend', (event) => {
+      // close if picker is open and target is picker tag...
+      if (this.pickerOpen && event.target.tagName !== 'WC-COLR-PICKR') {
+        this._rootTouchEnd(event);
       }
     });
 
@@ -298,7 +352,7 @@ export class WCColrPickr extends LitElement {
     picker.addEventListener('keydown', this.keyShortcuts.bind(this));
   }
 
-  handleMouseDown() {
+  _handleMouseDown() {
     // Define outline element
     let outlineElements = this.shadowRoot.querySelectorAll('.add_outline');
 
@@ -315,37 +369,132 @@ export class WCColrPickr extends LitElement {
     }
   }
 
+  // it's possible that these events have to be extended to the window 
+  // (if the user should be able to drag outside the picker container)
   _rootMouseMove(event) {
-    this.HueSlider.handleMouseMove(event);
-    this.OpacitySlider.handleMouseMove(event);
-    this.SaturationLightnessBox.handleMouseMove(event);
+    this.hueSlider.handleMouseMove(event);
+    this.opacitySlider.handleMouseMove(event);
+    this.saturationLightnessBox.handleMouseMove(event);
   }
 
   _rootMouseUp(event) {
-    this.HueSlider.handleMouseUp(event);
-    this.OpacitySlider.handleMouseUp(event);
-    this.SaturationLightnessBox.handleMouseUp(event);
+    this.hueSlider.handleMouseUp(event);
+    this.opacitySlider.handleMouseUp(event);
+    this.saturationLightnessBox.handleMouseUp(event);
   }
 
-  _rootTouchMove(event) {
-    this.HueSlider.handleTouchMove(event);
-    this.OpacitySlider.handleTouchMove(event);
-    this.SaturationLightnessBox.handleTouchMove(event);
+  _rootTouchMoveevent(event) {
+    this.hueSlider.handleTouchMove(event);
+    this.opacitySlider.handleTouchMove(event);
+    this.saturationLightnessBox.handleTouchMove(event);
   }
 
   _rootTouchEnd(event) {
-    this.HueSlider.handleTouchEnd(event);
-    this.OpacitySlider.handleTouchEnd(event);
-    this.SaturationLightnessBox.handleTouchEnd(event);
+    this.hueSlider.handleTouchEnd(event);
+    this.opacitySlider.handleTouchEnd(event);
+    this.saturationLightnessBox.handleTouchEnd(event);
+  }
+
+  _handleHueUpdate(event) {
+    if (event.detail.position === null) {
+      console.error(`${Static.component}._handleHueUpdate, invalid event`, event);
+      return;
+    }
+
+    // Defining the X position
+    let eventX = event.detail.position - this.colorSliderContainer.getBoundingClientRect().left;
+
+    // Making conditions so that the user don't drag outside the box
+    if (eventX < 11) eventX = 11;
+
+    if (eventX > 255) eventX = 255;
+
+    // Updating the X property of the dragger
+    this.colorSliderDragger.attributes.x.nodeValue = eventX;
+
+    // Percentage of the dragger on the X axis
+    const percent = ((eventX - 11) / 244) * 100;
+
+    // Calculating the color
+    // Max number for hue colors is 359, I find the percentage of this, from the percent variable
+    // I take it away from the max number because the slider should work backwards
+    const HColor = Math.round(359 - (359 / 100) * percent);
+
+    // Updating the Hue value in the data object
+    this.hue = HColor;
+
+    // Update the color text values
+    this.UpdatePicker.updateColorValueInput();
+
+    // Setting the data-color attribute to a color string
+    // This is so that the color updates properly on instances where the color has not been set
+    this.setAttribute('data-color', 'color');
+
+    // Update
+    this.updatePicker();
+  }
+
+  _handleOpacityUpdate(event) {
+    if (event.detail.alpha === null || event.detail.alphaX === null ) {
+      console.error(`${Static.component}._handleOpacityUpdate, invalid event`, event);
+      return;
+    }
+
+    this.alpha = event.detail.alpha;
+    this.alphaX = event.detail.alphaX;
+
+    // Update the color text values
+    this.UpdatePicker.updateColorValueInput();
+
+    // Setting the data-color attribute to a color string
+    // This is so that the color updates properly on instances where the color has not been set
+    this.setAttribute('data-color', 'color');
+
+    // Update
+    this.updatePicker();
+  }
+
+  _handleSaturationLightnessUpdate(event) {
+    if (event.detail.saturation === null || event.detail.lightness === null) {
+      console.error(`${Static.component}._handleSaturationLightnessUpdate, invalid event`, event);
+      return;
+    }
+
+    // Applying the Saturation and Lightness to the data object
+    this.saturation = event.detail.saturation;
+    this.lightness = event.detail.lightness;
+
+    // Update the color text values
+    this.UpdatePicker.updateColorValueInput();
+
+    // Setting the data-color attribute to a color string
+    // This is so that the color updates properly on instances where the color has not been set
+    this.setAttribute('data-color', 'color');
+
+    // Update
+    this.updatePicker();
+  }
+
+  _handleCustomColorsSelect(event) {
+    if (event.detail.color === null) {
+      console.error(`${Static.component}._handleCustomColorsSelect, invalid event`, event);
+      return;
+    }
+
+    // Updating the picker with that color
+    this.UpdatePicker.updateColorDisplays(event.detail.color);
+
+    // Update
+    this.updatePicker();
   }
 
   _getTemplate() {
     return html`
       <div class="wc-colr-pickr" 
-        @mousedown=${this.handleMouseDown}
+        @mousedown=${this._handleMouseDown}
         @mousemove=${this._rootMouseMove}
         @mouseup=${this._rootMouseUp}
-        @touchmove=${this._rootTouchMove}
+        @touchmove=${this._rootTouchMoveevent}
         @touchend=${this._rootTouchEnd}
       >
         <!-- Add a button to your HTML document and give it any ID -->
@@ -356,69 +505,23 @@ export class WCColrPickr extends LitElement {
         ></button>
         <aside id="color_picker" class="picker-container">
           <div class="picker-main">
-            <svg id="color_box" width="263" height="130"
-              @mousedown=${this.SaturationLightnessBox.handleMouseDown}
-              @touchstart=${this.SaturationLightnessBox.handleTouchStart}
+            <saturation-lightness-box
+              @saturation-lightness-update=${this._handleSaturationLightnessUpdate}
+              alpha="${this.alpha}"
+              hue="${this.hue}"
+              boxx="${this.boxX}"
+              boxy="${this.boxY}"
             >
-              <defs>
-                <linearGradient id="saturation" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#fff"></stop>
-                  <stop offset="100%" stop-color="hsl(0,100%,50%)"></stop>
-                </linearGradient>
-                <linearGradient id="brightness" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="rgba(0,0,0,0)"></stop>
-                  <stop offset="100%" stop-color="#000"></stop>
-                </linearGradient>
-                <pattern id="pattern_config" width="100%" height="100%">
-                  <rect x="0" y="0" width="100%" height="100%" fill="url(#saturation)"></rect>
-                  }
-                  <rect x="0" y="0" width="100%" height="100%" fill="url(#brightness)"></rect>
-                </pattern>
-              </defs>
-              <rect rx="5" ry="5" x="1" y="1" width="263" height="130" stroke="#fff" stroke-width="2" fill="url(#pattern_config)"></rect>
-              <svg id="box_dragger" x="336" y="14" style="overflow: visible">
-                <circle r="9" fill="none" stroke="#000" stroke-width="2"></circle>
-                <circle r="7" fill="none" stroke="#fff" stroke-width="2"></circle>
-              </svg>
-            </svg>
+            </saturation-lightness-box>
             <div id="sliders">
-              <svg id="color_slider" width="263" height="20" 
-                @mousedown=${this.HueSlider.handleMouseDown}
-                @touchstart=${this.HueSlider.handleTouchStart}
-              >
-                <defs>
-                  <linearGradient id="hue" x1="100%" y1="0%" x2="0%" y2="0%">
-                    <stop offset="0%" stop-color="#f00"></stop>
-                    <stop offset="16.666%" stop-color="#ff0"></stop>
-                    <stop offset="33.333%" stop-color="#0f0"></stop>
-                    <stop offset="50%" stop-color="#0ff"></stop>
-                    <stop offset="66.666%" stop-color="#00f"></stop>
-                    <stop offset="83.333%" stop-color="#f0f"></stop>
-                    <stop offset="100%" stop-color="#f00"></stop>
-                  </linearGradient>
-                </defs>
-                <rect rx="5" ry="5" x="1" y="1" width="263" height="20" stroke="#fff" stroke-width="2" fill="url(#hue)"></rect>
-                <svg id="color_slider_dragger" x="277" y="11" style="overflow: visible">
-                  <circle r="7" fill="none" stroke="#000" stroke-width="2"></circle>
-                  <circle r="5" fill="none" stroke="#fff" stroke-width="2"></circle>
-                </svg>
-              </svg>
-              <svg id="opacity_slider" width="263" height="20"
-                @mousedown=${this.OpacitySlider.handleMouseDown}
-                @touchstart=${this.OpacitySlider.handleTouchStart}
-              >
-                <defs>
-                  <linearGradient id="opacity" x1="100%" y1="0%" x2="0%" y2="0%">
-                    <stop offset="0%" stop-color="#000"></stop>
-                    <stop offset="100%" stop-color="#fff"></stop>
-                  </linearGradient>
-                </defs>
-                <rect rx="5" ry="5" x="1" y="6" width="263" height="10" stroke="#fff" stroke-width="2" fill="url(#opacity)"></rect>
-                <svg id="opacity_slider_dragger" x="277" y="11" style="overflow: visible">
-                  <circle r="7" fill="none" stroke="#000" stroke-width="2"></circle>
-                  <circle r="5" fill="none" stroke="#fff" stroke-width="2"></circle>
-                </svg>
-              </svg>
+              <hue-slider 
+                @hue-update=${this._handleHueUpdate} 
+                huex="${this.hueX}">
+              </hue-slider>
+              <opacity-slider 
+                @opacity-update=${this._handleOpacityUpdate} 
+                alphax="${this.alphaX}">
+              </opacity-slider>
             </div>
             <div id="color_text_values" tabindex="0">
               <div id="hexa">
@@ -497,49 +600,14 @@ export class WCColrPickr extends LitElement {
               </button>
             </div>
           </div>
-          <div id="custom_colors" class="picker-custom-colors">
-            <div id="custom_colors_header">
-              <svg id="custom_colors_pallet_icon" viewBox="0 0 24 24" width="15" height="18">
-                <path
-                  fill="#555"
-                  d="M4 21.832c4.587.38 2.944-4.493 7.188-4.538l1.838 1.534c.458 5.538-6.315 6.773-9.026 3.004zm14.065-7.115c1.427-2.239 5.847-9.749 5.847-9.749.352-.623-.43-1.273-.976-.813 0 0-6.572 5.714-8.511 7.525-1.532 1.432-1.539 2.086-2.035 4.447l1.68 1.4c2.227-.915 2.868-1.039 3.995-2.81zm-11.999 3.876c.666-1.134 1.748-2.977 4.447-3.262.434-2.087.607-3.3 2.547-5.112 1.373-1.282 4.938-4.409 7.021-6.229-1-2.208-4.141-4.023-8.178-3.99-6.624.055-11.956 5.465-11.903 12.092.023 2.911 1.081 5.571 2.82 7.635 1.618.429 2.376.348 3.246-1.134zm6.952-15.835c1.102-.006 2.005.881 2.016 1.983.004 1.103-.882 2.009-1.986 2.016-1.105.009-2.008-.88-2.014-1.984-.013-1.106.876-2.006 1.984-2.015zm-5.997 2.001c1.102-.01 2.008.877 2.012 1.983.012 1.106-.88 2.005-1.98 2.016-1.106.007-2.009-.881-2.016-1.988-.009-1.103.877-2.004 1.984-2.011zm-2.003 5.998c1.106-.007 2.01.882 2.016 1.985.01 1.104-.88 2.008-1.986 2.015-1.105.008-2.005-.88-2.011-1.985-.011-1.105.879-2.004 1.981-2.015zm10.031 8.532c.021 2.239-.882 3.718-1.682 4.587l-.046.044c5.255-.591 9.062-4.304 6.266-7.889-1.373 2.047-2.534 2.442-4.538 3.258z"
-                />
-              </svg>
-              <button id="custom_colors_add" class="remove_outline" name="add-a-custom-color"
-                @mousedown=${this.CustomColor.addCustomColor}
-              >
-                <svg viewBox="0 -2 24 24" width="14" height="16">
-                  <path fill="#555" d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
-                </svg>
-              </button>
-            </div>
-            <div id="custom_colors_box" 
-              @mousedown=${this.CustomColor.selectCustomColor} 
-              @contextmenu=${this.CustomColor.contextCustomColor}
-            >
-              ${this.LSCustomColors[0].map(
-                (color) =>
-                  html`<button                  
-                    class="custom_colors_preview"
-                    style="background-color: ${color.value};"
-                    data-custom-color="${color.value}"
-                    title="${color.label ? color.label + ' (' + color.value + ')' : color.value}"
-                  ></button>`
-              )}
-            </div>
-          </div>
-          <div id="color_context_menu" class="color_ctx_menu">
-            <button id="color_clear_single" class="color_ctx_menu" name="remove-single-color"
-              @mousedown=${this.CustomColor.clearSingleCustomColor}
-            >
-              Remove
-            </button>
-            <button id="color_clear_all" class="color_ctx_menu" name="remove-all-colors"
-              @mousedown=${this.CustomColor.clearAllCustomColors}
-            >
-              Remove All
-            </button>
-          </div>
+          <custom-colors
+            @custom-colors-select=${this._handleCustomColorsSelect}
+            hue="${this.hue}"
+            saturation="${this.saturation}"
+            lightness="${this.lightness}"
+            alpha="${this.alpha}"
+          >
+          </custom-colors>
         </aside>
       </div>
     `;

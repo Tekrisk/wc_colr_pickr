@@ -25,7 +25,7 @@
   .picker-container {
     display: none;
     grid-template-columns: min-content min-content min-content min-content;
-    grid-template-rows: min-content min-content min-content;
+    grid-template-rows: 245px;
     gap: 0px 0px;
     grid-template-areas:
       'picker-main picker-custom-colors . .'
@@ -133,6 +133,7 @@
     }
 
     #custom_colors {
+      height: 100%;
       text-align: left;
     }
 
@@ -161,7 +162,7 @@
 
     #custom_colors_box {
       padding: 0 0 0 10px;
-      height: calc(100% - 35px);
+      height: calc(100% - 10px);
       overflow-x: hidden;
       overflow-y: auto;
     }
